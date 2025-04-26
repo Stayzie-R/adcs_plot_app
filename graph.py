@@ -435,7 +435,8 @@ git remote -v
         return next(
             (
                 sensor for sensor in self.sensors
-                if sensor["color"] == received["color"] and sensor["vector"] == received["vector"]
+                if sensor["color"] == received["color"] and sensor["vector"] == tuple(received["vector"])
+
             ),
             None
         )

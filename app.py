@@ -76,7 +76,10 @@ def update_vector():
     ]
 
     for sensor in sensors:
-        print("SENSOR: ", sensor["color"], ", ", sensor["vector"], ", ", sensor["value"])
+        print("__________SENSOR_________")
+        print("color:",sensor["color"], ",type:" ,type(sensor["color"]))
+        print("vector:",sensor["vector"], ",type:" ,type(sensor["vector"]))
+        print("_________________________")
         
     graph.on_update(light_vector, sensors)
 
