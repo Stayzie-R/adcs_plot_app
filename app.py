@@ -84,14 +84,21 @@ def update_vector():
         
     graph.on_update(light_vector, sensors)
 
-    return flask.Response("""
-            <script>
-            window.dispatchEvent(new CustomEvent("update_vector", {detail: {trigger: true}}));
-            </script>
-            """, mimetype='text/html')
+    return flask.Response(f"""
+                <script>
+                window.dispatchEvent(new CustomEvent("update_vector", {{
+                    detail: {{
+                        light_vector: {light_vector}
+                    }}
+                }}));
+                </script>
+                """, mimetype='text/html')
 
 @app.callback(Output("3d-graph", "figure"),Input("listener", "event"),prevent_initial_call=True)
 def update_graph_on_event(e):
+    print("")
+    print("__here__")
+    print("")
     return graph
 
 if __name__ == "__main__":
