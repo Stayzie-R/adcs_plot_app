@@ -120,4 +120,11 @@ def update_graph(data):
 
 
 if __name__ == "__main__":
-    socketio.run(app.server, debug=config.DEBUG, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    socketio.run(
+        app.server,
+        debug=config.DEBUG,
+        host='0.0.0.0',
+        port=int(os.environ.get("PORT", 5000)),
+        #port=8050,
+        #allow_unsafe_werkzeug=True
+    )
