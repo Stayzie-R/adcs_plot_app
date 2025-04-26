@@ -298,7 +298,7 @@ class Graph:
         for received in sensors_received:
             sensor = self._validate_sensor(received)
             if sensor:
-                sensor["normalized_value"] = received["normalized_value"]
+                sensor["value"] = received["value"]
             else:
                 print(f"[Warning] Sensor not matched: {received}")
 
