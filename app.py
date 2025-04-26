@@ -13,12 +13,13 @@ from graph import Graph
 # Nastavení Flask serveru a Flask-SocketIO
 server = flask.Flask(__name__)
 secret_key = os.environ.get("SECRET_KEY", "secret")
-socketio = SocketIO(server)
+socketio = SocketIO(server, cors_allowed_origins="*", async_mode="eventlet")
 
 app = dash.Dash(
     __name__,
     server=server,
-    update_title="ADCS"
+    update_title="ADCS",
+    suppress_callback_exceptions=True
 )
 
 graph = Graph()
@@ -64,7 +65,7 @@ def update_camera(relayout_data):
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
     data = request.get_json()
-    print("Received update_vector data:", data)  # Logování přijatých dat na serveru
+    print("Received update_vector data:", data)
 
     light_vector = data["light_vector"]
     sensors = [
