@@ -56,8 +56,8 @@ app.layout = html.Div(
 def update_camera(relayout_data):
     if relayout_data and 'scene.camera' in relayout_data:
         camera = relayout_data['scene.camera']['eye']
-        return f"Camera position:\nx: {camera['x']:.2f}, y: {camera['y']:.2f}, z: {camera['z']:.2f}"
-    return "Camera position: not moved yet"
+    #     return f"Camera position:\nx: {camera['x']:.2f}, y: {camera['y']:.2f}, z: {camera['z']:.2f}"
+    # return "Camera position: not moved yet"
 
 
 # Endpoint pro aktualizaci vektorů
@@ -83,10 +83,10 @@ def update_vector():
         print("vector:", sensor["vector"], ", type:", type(sensor["vector"]))
         print("_________________________")
 
-    # Aktualizace grafu na serveru
+
     graph.on_update(light_vector, sensors)
 
-    # Odeslání eventu na frontend přes WebSocket
+
     socketio.emit('update_vector', {
         'light_vector': light_vector,
         'sensors': sensors
@@ -95,25 +95,22 @@ def update_vector():
     return flask.Response("Vector updated", status=200)
 
 
-# Sledování SocketIO eventu pro update grafu
 @socketio.on('update_vector')
 def update_graph_on_event(data):
     print("__here__")  # Debug info
     light_vector = data.get('light_vector')
     sensors = data.get('sensors')
 
-    # Zde aktualizujeme graf podle přijatých dat
+
     graph.on_update(light_vector, sensors)
 
-    # Aktualizace grafu v Dash
-    # Můžete použít emit pro aktualizaci frontendového grafu na požádání
     emit('graph_update', graph.figure)
 
 
-# Callback pro update grafu na základě přijatých eventů (SocketIO)
+
 @app.callback(
     Output("3d-graph", "figure"),
-    Input('graph_update', 'data'),  # Příjem dat od SocketIO
+    Input('graph_update', 'data'),
     prevent_initial_call=True
 )
 def update_graph(data):
@@ -122,6 +119,5 @@ def update_graph(data):
     return data
 
 
-# Spuštění aplikace s podporou WebSocketů
 if __name__ == "__main__":
     socketio.run(app.server, debug=config.DEBUG, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
