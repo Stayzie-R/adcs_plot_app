@@ -75,23 +75,19 @@ def update_vector():
         for sensor in data["sensors"]
     ]
 
-    # Tisk dat pro debug
-    for sensor in sensors:
-        print("__________SENSOR_________")
-        print("received sensor data")
-        print("color:", sensor["color"], ", type:", type(sensor["color"]))
-        print("vector:", sensor["vector"], ", type:", type(sensor["vector"]))
-        print("_________________________")
-
+    # for sensor in sensors:
+    #     print("__________SENSOR_________")
+    #     print("received sensor data")
+    #     print("color:", sensor["color"], ", type:", type(sensor["color"]))
+    #     print("vector:", sensor["vector"], ", type:", type(sensor["vector"]))
+    #     print("_________________________")
 
     graph.on_update(light_vector, sensors)
-
 
     socketio.emit('update_vector', {
         'light_vector': light_vector,
         'sensors': sensors
     })
-
     return flask.Response("Vector updated", status=200)
 
 
@@ -114,6 +110,7 @@ def update_graph_on_event(data):
     prevent_initial_call=True
 )
 def update_graph(data):
+    print("HERE HERE HERE ")
     if data is None:
         raise PreventUpdate
     return data
