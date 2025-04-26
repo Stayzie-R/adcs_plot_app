@@ -74,6 +74,10 @@ def update_vector():
         }
         for sensor in data["sensors"]
     ]
+
+    for sensor in self.sensors:
+        print("SENSOR: ", sensor["color"], ", ", sensor["vector"], ", ", sensor["value"])
+        
     graph.on_update(light_vector, sensors)
 
     return flask.Response("""
