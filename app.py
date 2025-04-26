@@ -37,6 +37,7 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
+        dcc.Store(id='graph_update_store'),
         html.Pre(id='camera-output')
     ],
     style={
@@ -106,11 +107,11 @@ def update_graph_on_event(data):
 
 @app.callback(
     Output("3d-graph", "figure"),
-    Input('graph_update', 'data'),
+    Input('graph_update_store', 'data'),
     prevent_initial_call=True
 )
 def update_graph(data):
-    print("HERE HERE HERE ")
+    print("HERE HERE HERE")
     if data is None:
         raise PreventUpdate
     return data
