@@ -85,24 +85,11 @@ def update_vector():
 
     graph.on_update(light_vector, sensors)
 
-    socketio.emit('update_vector', {
+    socketio.emit('graph_update', {
         'light_vector': light_vector,
         'sensors': sensors
     })
     return flask.Response("Vector updated", status=200)
-
-
-@socketio.on('update_vector')
-def update_graph_on_event(data):
-    print("__here__")  # Debug info
-    light_vector = data.get('light_vector')
-    sensors = data.get('sensors')
-
-
-    graph.on_update(light_vector, sensors)
-
-    emit('graph_update', graph.figure)
-
 
 
 @app.callback(
