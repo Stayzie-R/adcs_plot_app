@@ -61,10 +61,10 @@ def update_camera(relayout_data):
     # return "Camera position: not moved yet"
 
 
-# Endpoint pro aktualizaci vektorů
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
     data = request.get_json()
+    print("Received update_vector data:", data)  # Logování přijatých dat na serveru
 
     light_vector = data["light_vector"]
     sensors = [
@@ -76,19 +76,18 @@ def update_vector():
         for sensor in data["sensors"]
     ]
 
-    # for sensor in sensors:
-    #     print("__________SENSOR_________")
-    #     print("received sensor data")
-    #     print("color:", sensor["color"], ", type:", type(sensor["color"]))
-    #     print("vector:", sensor["vector"], ", type:", type(sensor["vector"]))
-    #     print("_________________________")
-
     graph.on_update(light_vector, sensors)
+
+    print("Emitting graph_update with data:", {
+        'light_vector': light_vector,
+        'sensors': sensors
+    })  # Logování před odesláním dat na klienta
 
     socketio.emit('graph_update', {
         'light_vector': light_vector,
         'sensors': sensors
     })
+
     return flask.Response("Vector updated", status=200)
 
 
