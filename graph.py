@@ -353,7 +353,7 @@ class Graph:
         """
         legends = [trace for trace in self._fig.data if trace.name is not None and 'Sensor' in trace.name]
         for it, legend in enumerate(legends):
-            legend.name = f'Sensor {str(it + 1)}: {str(self.sensor_values[it])} V'
+            legend.name = f'Sensor {str(it + 1)}: {str(self.sensor[it].value)} V'
 
     def on_remove(self):
         """
