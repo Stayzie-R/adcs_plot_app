@@ -1,5 +1,4 @@
 import os
-
 import flask
 from flask import request
 from flask_socketio import SocketIO, emit
@@ -7,14 +6,14 @@ from flask_socketio import SocketIO, emit
 import dash
 from dash import dcc, html, Output, Input
 from dash.exceptions import PreventUpdate
-from dash_extensions import EventListener
 
 import config
 from graph import Graph
 
-
+# Nastavení Flask serveru a Flask-SocketIO
 server = flask.Flask(__name__)
 secret_key = os.environ.get("SECRET_KEY", "secret")
+socketio = SocketIO(server)
 
 app = dash.Dash(
     __name__,
@@ -24,7 +23,7 @@ app = dash.Dash(
 
 graph = Graph()
 
-
+# Layout aplikace
 app.layout = html.Div(
     children=[
         dcc.Graph(
@@ -38,7 +37,6 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
-        WebSocket(id="ws", url="/ws"),
         html.Pre(id='camera-output')
     ],
     style={
@@ -49,14 +47,20 @@ app.layout = html.Div(
     }
 )
 
+
+# Callback pro sledování pozice kamery
 @app.callback(
-    Output('camera-output', 'children'), Input('3d-graph', 'relayoutData'))
+    Output('camera-output', 'children'),
+    Input('3d-graph', 'relayoutData')
+)
 def update_camera(relayout_data):
     if relayout_data and 'scene.camera' in relayout_data:
         camera = relayout_data['scene.camera']['eye']
-        #return f"Camera position:\nx: {camera['x']:.2f}, y: {camera['y']:.2f}, z: {camera['z']:.2f}"
-    #return "Camera position: not moved yet"
+        return f"Camera position:\nx: {camera['x']:.2f}, y: {camera['y']:.2f}, z: {camera['z']:.2f}"
+    return "Camera position: not moved yet"
 
+
+# Endpoint pro aktualizaci vektorů
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
     data = request.get_json()
@@ -71,26 +75,53 @@ def update_vector():
         for sensor in data["sensors"]
     ]
 
+    # Tisk dat pro debug
     for sensor in sensors:
         print("__________SENSOR_________")
         print("received sensor data")
-        print("color:",sensor["color"], ",type:" ,type(sensor["color"]))
-        print("vector:",sensor["vector"], ",type:" ,type(sensor["vector"]))
+        print("color:", sensor["color"], ", type:", type(sensor["color"]))
+        print("vector:", sensor["vector"], ", type:", type(sensor["vector"]))
         print("_________________________")
 
+    # Aktualizace grafu na serveru
     graph.on_update(light_vector, sensors)
 
-    socketio.emit('update_vector', {'light_vector': light_vector})
-    return {"status": "ok"}
+    # Odeslání eventu na frontend přes WebSocket
+    socketio.emit('update_vector', {
+        'light_vector': light_vector,
+        'sensors': sensors
+    })
 
-@app.callback(Output("3d-graph", "figure"),Input("ws", "message"),prevent_initial_call=True)
-def update_graph_on_ws(message):
-    print("")
-    print("__received websocket update__")
-    print("")
-    return graph.figure
+    return flask.Response("Vector updated", status=200)
 
 
+# Sledování SocketIO eventu pro update grafu
+@socketio.on('update_vector')
+def update_graph_on_event(data):
+    print("__here__")  # Debug info
+    light_vector = data.get('light_vector')
+    sensors = data.get('sensors')
+
+    # Zde aktualizujeme graf podle přijatých dat
+    graph.on_update(light_vector, sensors)
+
+    # Aktualizace grafu v Dash
+    # Můžete použít emit pro aktualizaci frontendového grafu na požádání
+    emit('graph_update', graph.figure)
+
+
+# Callback pro update grafu na základě přijatých eventů (SocketIO)
+@app.callback(
+    Output("3d-graph", "figure"),
+    Input('graph_update', 'data'),  # Příjem dat od SocketIO
+    prevent_initial_call=True
+)
+def update_graph(data):
+    if data is None:
+        raise PreventUpdate
+    return data
+
+
+# Spuštění aplikace s podporou WebSocketů
 if __name__ == "__main__":
-    socketio.run(debug=config.DEBUG)
-
+    socketio.run(app.server, debug=config.DEBUG, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
