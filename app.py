@@ -2,6 +2,7 @@ import os
 
 import flask
 from flask import request
+from flask_socketio import SocketIO, emit
 
 import dash
 from dash import dcc, html, Output, Input
@@ -37,12 +38,7 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
-        EventListener(
-                    id="listener",
-                    events=[{"event": "update_vector", "props": ["detail"]}],
-                    logging=False,
-                    children=[],
-                ),
+        WebSocket(id="ws", url="/ws"),
         html.Pre(id='camera-output')
     ],
     style={
@@ -75,32 +71,26 @@ def update_vector():
         for sensor in data["sensors"]
     ]
 
-    # for sensor in sensors:
-    #     print("__________SENSOR_________")
-    #     print("received sensor data")
-    #     print("color:",sensor["color"], ",type:" ,type(sensor["color"]))
-    #     print("vector:",sensor["vector"], ",type:" ,type(sensor["vector"]))
-    #     print("_________________________")
-        
+    for sensor in sensors:
+        print("__________SENSOR_________")
+        print("received sensor data")
+        print("color:",sensor["color"], ",type:" ,type(sensor["color"]))
+        print("vector:",sensor["vector"], ",type:" ,type(sensor["vector"]))
+        print("_________________________")
+
     graph.on_update(light_vector, sensors)
 
-    return flask.Response(f"""
-                <script>
-                window.dispatchEvent(new CustomEvent("update_vector", {{
-                    detail: {{
-                        light_vector: {light_vector}
-                    }}
-                }}));
-                </script>
-                """, mimetype='text/html')
+    socketio.emit('update_vector', {'light_vector': light_vector})
+    return {"status": "ok"}
 
-@app.callback(Output("3d-graph", "figure"),Input("listener", "event"),prevent_initial_call=True)
-def update_graph_on_event(e):
+@app.callback(Output("3d-graph", "figure"),Input("ws", "message"),prevent_initial_call=True)
+def update_graph_on_ws(message):
     print("")
-    print("__here__")
+    print("__received websocket update__")
     print("")
     return graph.figure
 
+
 if __name__ == "__main__":
-    app.run(debug=config.DEBUG)
+    socketio.run(debug=config.DEBUG)
 
