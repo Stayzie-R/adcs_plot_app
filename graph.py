@@ -431,6 +431,7 @@ git remote -v
         Returns:
             dict or None: The matched sensor dictionary if found, otherwise None.
         """
+
         return next(
             (
                 sensor for sensor in self.sensors
