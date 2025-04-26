@@ -320,15 +320,25 @@ class Graph:
         The arrow originates from the origin and points toward the direction of
         `self.light_vector`, using styling properties defined in the config.py.
         """
+        target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH
+        vec = np.array(self.light_vector)
+        vec_len = np.linalg.norm(vec)
+
+        if vec_len != 0:
+            scaled_vec = vec / vec_len * target_length
+        else:
+            scaled_vec = vec
+
         vector_traces = [
             trace for trace in self._fig.data if trace.name == 'light_vector'
         ]
 
+
         if vector_traces:
             for arrow_trace in vector_traces:
-                arrow_trace.x = [0, self.light_vector[0]]
-                arrow_trace.y = [0, self.light_vector[1]]
-                arrow_trace.z = [0, self.light_vector[2]]
+                arrow_trace.x = [0, scaled_vec[0]]
+                arrow_trace.y = [0, scaled_vec[1]]
+                arrow_trace.z = [0, scaled_vec[2]]
         else:
             arrow_properties = dict(
                 line=dict(
@@ -337,9 +347,9 @@ class Graph:
                 )
             )
             vec_trace = go.Scatter3d(
-                x=[0, self.light_vector[0]],
-                y=[0, self.light_vector[1]],
-                z=[0, self.light_vector[2]],
+                x=[0, scaled_vec[0]],
+                y=[0, scaled_vec[1]],
+                z=[0, scaled_vec[2]],
                 mode='lines',
                 name='light_vector',
                 showlegend=False,
