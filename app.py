@@ -99,7 +99,7 @@ def update_graph_on_event(e):
     print("")
     print("__here__")
     print("")
-    return graph
+    return graph.figure
 
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)
