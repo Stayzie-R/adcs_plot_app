@@ -35,7 +35,7 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
-        dcc.Interval(id='interval-component',interval=1),
+        dcc.Interval(id='interval-component',interval=1000),
         dcc.Store(id='data-store', data={'update': False})
     ],
     style={
@@ -72,6 +72,7 @@ def update_plot(n_intervals):
         app.layout['data-store'].data['update'] = False
         return graph.update_light_vec()
     else:
+        
         raise PreventUpdate
 
 
