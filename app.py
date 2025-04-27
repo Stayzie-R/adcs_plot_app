@@ -73,7 +73,7 @@ def check_for_update(n_intervals):
     if data_ready:
         data_ready = False
         print(f"[Interval {n_intervals}] Nová data! Překresluji graf.")
-        return graph.figure  # Vracíš už aktualizovaný graf
+        return graph.figure  
     else:
         raise PreventUpdate
 
