@@ -14,7 +14,7 @@ from graph import Graph
 server = flask.Flask(__name__)
 secret_key = os.environ.get("SECRET_KEY", "secret")
 message_queue = queue.Queue()
-
+data_ready = False
 app = dash.Dash(
     __name__,
     server=server,
@@ -37,7 +37,7 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
-        dcc.Store(id="light-vector-store"),
+        dcc.Interval(id='interval-component',interval=1000),
     ],
     style={
         "display": "flex",
@@ -49,7 +49,7 @@ app.layout = html.Div(
 
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
-
+    global data_ready
     data = request.get_json()
 
     light_vector = data["light_vector"]
@@ -64,18 +64,18 @@ def update_vector():
 
     message_queue.put('new_data')
     graph.on_update(light_vector, sensors)
+    data_ready = True
     return jsonify({"status": "success", "message": "Data received and processed"})
 
-
-@app.server.route('/stream')
-def stream():
-    def event_stream():
-        while True:
-            msg = message_queue.get()
-            yield f"data: {msg}\n\n"
-
-    return Response(event_stream(), mimetype="text/event-stream")
-
+@app.callback(Output("3d-graph", "figure"),Input("interval-check", "n_intervals"),prevent_initial_call=True)
+def check_for_update(n_intervals):
+    global data_ready
+    if data_ready:
+        data_ready = False
+        print(f"[Interval {n_intervals}] Nová data! Překresluji graf.")
+        return graph.figure  # Vracíš už aktualizovaný graf
+    else:
+        raise PreventUpdate
 
 
 if __name__ == "__main__":
