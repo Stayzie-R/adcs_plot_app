@@ -1,19 +1,16 @@
 console.log("Testovací zpráva: Skript je načten");
 
-const eventSource = new EventSource('/update_vector');
+const eventSource = new EventSource('/stream');
 
 eventSource.onopen = function() {
     console.log("SSE spojení otevřeno");
 };
 
 eventSource.onmessage = function(event) {
-
-    const storeElement = document.getElementById('light-vector-store');
-    storeElement.data = storeElement.data === true ? false : true;
-
-    console.log('storeElement data změněna na:', storeElement.data);
+    console.log("Přijata zpráva:", event.data);
+    
 };
 
 eventSource.onerror = function(event) {
-    console.error("Chyba při spojení s SSE:", event);
+    console.error("Chyba při SSE spojení:", event);
 };

@@ -44,9 +44,11 @@ app.layout = html.Div(
         "height": "100vh"
     }
 )
+data_ready = False
 
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
+    global data_ready
     data = request.get_json()
 
     light_vector = data["light_vector"]
@@ -58,12 +60,17 @@ def update_vector():
         }
         for sensor in data["sensors"]
     ]
+    data_ready = True
     graph.on_update(light_vector, sensors)
+    return jsonify({"status": "success", "message": "Data received and processed"})
 
-    return jsonify({
-        "status": "success",
-        "message": "Data received and processed",
-    })
+def stream():
+    def event_stream():
+        while True:
+            msg = message_queue.get()
+            yield f"data: {msg}\n\n"
+
+    return Response(event_stream(), mimetype="text/event-stream")
 
 
 
