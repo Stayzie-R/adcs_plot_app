@@ -11,6 +11,12 @@ from dash.exceptions import PreventUpdate
 import config
 from graph import Graph
 
+import logging
+
+# Zakáže logování pro HTTP požadavky
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
 server = flask.Flask(__name__)
 secret_key = os.environ.get("SECRET_KEY", "secret")
 app = dash.Dash(
@@ -46,23 +52,23 @@ app.layout = html.Div(
     }
 )
 
-@app.server.route('/update_vector', methods=['POST'])
-def update_vector():
-    data = request.get_json()
-
-    light_vector = data["light_vector"]
-    sensors = [
-        {
-            "color": sensor["color"],
-            "vector": sensor["vector"],
-            "value": round(sensor["value"], 4)
-        }
-        for sensor in data["sensors"]
-    ]
-    print("data received")
-    graph.on_update(light_vector, sensors)
-    app.layout['data-store'].data['update'] = True
-    return jsonify({"status": "success", "message": "Data received and processed"})
+# @app.server.route('/update_vector', methods=['POST'])
+# def update_vector():
+#     data = request.get_json()
+# 
+#     light_vector = data["light_vector"]
+#     sensors = [
+#         {
+#             "color": sensor["color"],
+#             "vector": sensor["vector"],
+#             "value": round(sensor["value"], 4)
+#         }
+#         for sensor in data["sensors"]
+#     ]
+#     print("data received")
+#     graph.on_update(light_vector, sensors)
+#     app.layout['data-store'].data['update'] = True
+#     return jsonify({"status": "success", "message": "Data received and processed"})
 
 @app.callback(Output('3d-graph', 'figure'),
               [Input('interval-component', 'n_intervals')])
