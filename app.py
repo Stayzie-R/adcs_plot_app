@@ -67,12 +67,10 @@ def update_vector():
 @app.callback(Output('3d-graph', 'figure'),
               [Input('interval-component', 'n_intervals')])
 def update_plot(n_intervals):
-    print("---- INTERVAL --- ")
     if app.layout['data-store'].data['update']:
         app.layout['data-store'].data['update'] = False
         return graph.update_light_vec()
     else:
-        
         raise PreventUpdate
 
 
