@@ -10,8 +10,9 @@ from dash.exceptions import PreventUpdate
 import config
 from graph import Graph
 
-# Nastavení Flask serveru a Flask-SocketIO
+
 server = flask.Flask(__name__)
+server = app.server
 secret_key = os.environ.get("SECRET_KEY", "secret")
 socketio = SocketIO(server, cors_allowed_origins="*", async_mode="eventlet")
 
@@ -22,7 +23,30 @@ app = dash.Dash(
     suppress_callback_exceptions=True
 )
 
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+        <script src="/socketio_client.js"></script>
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
+
 graph = Graph()
+
 
 # Layout aplikace
 app.layout = html.Div(
