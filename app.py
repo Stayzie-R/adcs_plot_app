@@ -33,6 +33,7 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
+        dcc.Store(id="light-vector-store"),
     ],
     style={
         "display": "flex",
@@ -60,9 +61,9 @@ def update_vector():
 
     print("Data received")
 
-    app.server.flask.after_this_request(lambda: app.server.dash_clientside.set_props(
+    app.server.dash_clientside.set_props(
         "light-vector-store", {"data": light_vector}
-    ))
+    )
     return flask.Response("Vector updated", status=200)
 
 
@@ -77,6 +78,17 @@ def update_graph(light_vector):
     print("Updating the graph with new vector")
     return graph.figure
 
+
+# Callback pro aktualizaci light_vector ve store
+@app.callback(
+    Output('light-vector-store', 'data'),
+    [Input('3d-graph', 'id')]
+)
+def update_light_vector_from_flask(n):
+    print("new vector")
+    if light_vector is not None:
+        return light_vector
+    raise PreventUpdate
 
 
 
