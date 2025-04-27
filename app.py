@@ -61,14 +61,6 @@ def update_vector():
 
     return jsonify({"message": "Vector updated"}), 200
 
-@app.callback(
-    Output('light-vector-store', 'data'),
-    Input('light-vector-store', 'data')  # Toto bude vstupní změna pro callback
-)
-def log_update(data):
-    if data is not None:
-        print("Data byla úspěšně aktualizována:", data)
-    return data
 
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)
