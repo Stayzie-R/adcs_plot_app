@@ -73,11 +73,8 @@ app.layout = html.Div(
               [Input('interval-component', 'n_intervals')])
 def update_plot(n_intervals):
     print("Interval: ", n_intervals)
-    if app.layout['data-store'].data['update']:
-        app.layout['data-store'].data['update'] = False
-        return graph.figure
-    else:
-        raise PreventUpdate
+    return graph.figure
+   
 
 
 if __name__ == "__main__":
