@@ -62,7 +62,6 @@ def update_vector():
 
     def event_stream():
         yield f"data: Vector updated\n\n"
-        time.sleep(1)  
 
     return Response(event_stream(), content_type='text/event-stream')
 
