@@ -1,7 +1,6 @@
 import os
 import flask
 from flask import request
-
 import dash
 from dash import dcc, html, Output, Input
 from dash.exceptions import PreventUpdate
@@ -62,17 +61,18 @@ def update_vector():
     graph.on_update(light_vector, sensors)
 
     print("Data received")
-    # Vrátíme nový vektor do dcc.Store pomocí callbacku, ne manuálně
+    # Vrátíme nový vektor do dcc.Store přes Dash callback
+    app.client_data['light-vector-store.data'] = light_vector
     return flask.Response("Vector updated", status=200)
 
-
-# Callback pro uložené hodnoty do dcc.Store
+# Callback pro zobrazení hodnoty light_vector
 @app.callback(
     Output('light-vector-store', 'data'),
     Input('light-vector-store', 'data'),
     prevent_initial_call=True
 )
 def store_light_vector(light_vector):
+    # Nastavíme novou hodnotu pro light_vector
     if not light_vector:
         raise PreventUpdate
     return light_vector
