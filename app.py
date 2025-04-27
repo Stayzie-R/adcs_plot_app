@@ -59,7 +59,11 @@ def update_vector():
     ]
     graph.on_update(light_vector, sensors)
 
-    return jsonify({"message": "Vector updated"}), 200
+    def event_stream():
+        yield f"data: Vector updated\n\n"
+        time.sleep(1)  
+
+    return Response(event_stream(), content_type='text/event-stream')
 
 
 if __name__ == "__main__":
