@@ -1,5 +1,6 @@
 import os
 import time
+import queue
 import flask
 from flask import request, jsonify,Response
 
@@ -12,6 +13,7 @@ from graph import Graph
 
 server = flask.Flask(__name__)
 secret_key = os.environ.get("SECRET_KEY", "secret")
+message_queue = queue.Queue()
 
 app = dash.Dash(
     __name__,
@@ -44,11 +46,10 @@ app.layout = html.Div(
         "height": "100vh"
     }
 )
-data_ready = False
 
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
-    global data_ready
+
     data = request.get_json()
 
     light_vector = data["light_vector"]
@@ -60,10 +61,13 @@ def update_vector():
         }
         for sensor in data["sensors"]
     ]
-    data_ready = True
+
+    message_queue.put('new_data')
     graph.on_update(light_vector, sensors)
     return jsonify({"status": "success", "message": "Data received and processed"})
 
+
+@app.server.route('/stream')
 def stream():
     def event_stream():
         while True:
