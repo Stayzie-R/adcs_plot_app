@@ -60,7 +60,6 @@ def update_vector():
         for sensor in data["sensors"]
     ]
 
-    message_queue.put('new_data')
     graph.on_update(light_vector, sensors)
     app.layout['data-store'].data['update'] = True
     return jsonify({"status": "success", "message": "Data received and processed"})
