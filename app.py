@@ -18,7 +18,9 @@ app = dash.Dash(
     update_title="ADCS",
     suppress_callback_exceptions=True
 )
+
 graph = Graph()
+
 app.layout = html.Div(
     children=[
         dcc.Graph(
@@ -32,6 +34,9 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
+        # Store pro uložení hodnoty light_vector
+        dcc.Store(id='light-vector-store', data={}),
+        html.Div(id='light-vector-output')  # Zobrazování nové hodnoty light_vector
     ],
     style={
         "display": "flex",
@@ -57,10 +62,30 @@ def update_vector():
     graph.on_update(light_vector, sensors)
 
     print("Data received")
-
-
+    # Vrátíme nový vektor do dcc.Store pomocí callbacku, ne manuálně
     return flask.Response("Vector updated", status=200)
 
+
+# Callback pro uložené hodnoty do dcc.Store
+@app.callback(
+    Output('light-vector-store', 'data'),
+    Input('light-vector-store', 'data'),
+    prevent_initial_call=True
+)
+def store_light_vector(light_vector):
+    if not light_vector:
+        raise PreventUpdate
+    return light_vector
+
+# Callback pro zobrazení hodnoty light_vector
+@app.callback(
+    Output('light-vector-output', 'children'),
+    Input('light-vector-store', 'data')  
+)
+def update_output(light_vector):
+    if not light_vector:
+        raise PreventUpdate  
+    return f'Nová hodnota light_vector: {light_vector}'
 
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)
