@@ -58,38 +58,16 @@ def update_vector():
     ]
     graph.on_update(light_vector, sensors)
 
-
-    print("Data received")
-
-    app.server.dash_clientside.set_props(
-        "light-vector-store", {"data": light_vector}
-    )
     return flask.Response("Vector updated", status=200)
 
-
-# Callback pro aktualizaci grafu
+e
 @app.callback(
     Output('3d-graph', 'figure'),
-    Input('light-vector-store', 'data')
+    Input('light-vector-store', 'data')  
 )
-def update_graph(light_vector):
-    if light_vector is None:
-        raise PreventUpdate  # Neprovádět změny, pokud není žádný nový light_vector
-    print("Updating the graph with new vector")
+def update_graph(data):
+    print("update-graph")
     return graph.figure
-
-
-# Callback pro aktualizaci light_vector ve store
-@app.callback(
-    Output('light-vector-store', 'data'),
-    [Input('3d-graph', 'id')]
-)
-def update_light_vector_from_flask(n):
-    print("new vector")
-    if light_vector is not None:
-        return light_vector
-    raise PreventUpdate
-
 
 
 if __name__ == "__main__":
