@@ -67,7 +67,7 @@ def update_vector():
     data_ready = True
     return jsonify({"status": "success", "message": "Data received and processed"})
 
-@app.callback(Output("3d-graph", "figure"),Input("interval-check", "n_intervals"),prevent_initial_call=True)
+@app.callback(Output("3d-graph", "figure"),Input("interval-component", "n_intervals"),prevent_initial_call=True)
 def check_for_update(n_intervals):
     global data_ready
     if data_ready:
