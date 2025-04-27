@@ -59,7 +59,7 @@ def update_vector():
         }
         for sensor in data["sensors"]
     ]
-
+    print("data received")
     graph.on_update(light_vector, sensors)
     app.layout['data-store'].data['update'] = True
     return jsonify({"status": "success", "message": "Data received and processed"})
@@ -69,6 +69,7 @@ def update_vector():
 def update_plot(n_intervals):
     if app.layout['data-store'].data['update']:
         app.layout['data-store'].data['update'] = False
+        print("update graph ")
         return graph.update_light_vec()
     else:
         raise PreventUpdate
