@@ -60,10 +60,11 @@ def update_vector():
     ]
     graph.on_update(light_vector, sensors)
 
-    def event_stream():
-        yield f"data: {json.dumps({'status': 'success', 'message': 'Data received and processed'})}\n\n"
+    return jsonify({
+        "status": "success",
+        "message": "Data received and processed",
+    })
 
-    return Response(event_stream(), content_type='text/event-stream')
 
 
 if __name__ == "__main__":
