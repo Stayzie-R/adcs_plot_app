@@ -58,7 +58,7 @@ def update_vector():
     ]
     graph.on_update(light_vector, sensors)
 
-    return flask.Response("Vector updated", status=200)
+    return jsonify({"message": "Vector updated"}), 200
 
 e
 @app.callback(
