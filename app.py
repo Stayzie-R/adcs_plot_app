@@ -35,7 +35,7 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
-        dcc.Interval(id='interval-component',interval=1000),
+        dcc.Interval(id='interval-component',interval=1),
         dcc.Store(id='data-store', data={'update': False})
     ],
     style={
