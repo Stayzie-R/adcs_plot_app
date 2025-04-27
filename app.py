@@ -1,6 +1,7 @@
 import os
 import flask
-from flask import request
+from flask import request, jsonify
+
 import dash
 from dash import dcc, html, Output, Input
 from dash.exceptions import PreventUpdate
@@ -60,15 +61,14 @@ def update_vector():
 
     return jsonify({"message": "Vector updated"}), 200
 
-e
 @app.callback(
-    Output('3d-graph', 'figure'),
-    Input('light-vector-store', 'data')  
+    Output('light-vector-store', 'data'),
+    Input('light-vector-store', 'data')  # Toto bude vstupní změna pro callback
 )
-def update_graph(data):
-    print("update-graph")
-    return graph.figure
-
+def log_update(data):
+    if data is not None:
+        print("Data byla úspěšně aktualizována:", data)
+    return data
 
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)
