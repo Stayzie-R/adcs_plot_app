@@ -13,7 +13,6 @@ from graph import Graph
 
 import logging
 
-# Zakáže logování pro HTTP požadavky
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
