@@ -9,10 +9,8 @@ from dash.exceptions import PreventUpdate
 import config
 from graph import Graph
 
-
 server = flask.Flask(__name__)
 secret_key = os.environ.get("SECRET_KEY", "secret")
-
 
 app = dash.Dash(
     __name__,
@@ -23,8 +21,6 @@ app = dash.Dash(
 
 graph = Graph()
 
-
-# Layout aplikace
 app.layout = html.Div(
     children=[
         dcc.Graph(
@@ -38,7 +34,7 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
-    dcc.Store(id='light-vector-store', data=update_light_vector()),
+        dcc.Store(id='light-vector-store', data=update_light_vector()),
     ],
     style={
         "display": "flex",
@@ -73,11 +69,41 @@ def update_vector():
 
     return flask.Response("Vector updated", status=200)
 
-
-@app.callback(Output('light-vector-output', 'children'),Input('light-vector-store', 'data'))
+@app.callback(
+    Output('light-vector-output', 'children'),
+    Input('light-vector-store', 'data')
+)
 def update_output(light_vector):
+    print("Callback1")
     return f'Nová hodnota light_vector: {light_vector}'
 
+
+@app.callback(
+    Output('light-vector-store', 'data'), Input('light-vector-store', 'data'),
+    prevent_initial_call=True
+)
+def update_store(light_vector):
+    print("Callback2")
+    return light_vector
+
+
+@app.callback(
+    Output('light-vector-store', 'data'),
+    Input('light-vector-store', 'data'),
+    prevent_initial_call=True
+)
+def update_store(light_vector):
+    if dash.callback_context.triggered:
+        print("Callback3!")
+    return light_vector
+
+
+@app.callback(
+    Output('light-vector-store', 'data'),Input('light-vector-store', 'data'),prevent_initial_call=True
+)
+def update_store(light_vector):
+    print("callback4")
+    return light_vector
 
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)
