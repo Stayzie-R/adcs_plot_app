@@ -18,9 +18,7 @@ app = dash.Dash(
     update_title="ADCS",
     suppress_callback_exceptions=True
 )
-
 graph = Graph()
-
 app.layout = html.Div(
     children=[
         dcc.Graph(
@@ -34,7 +32,6 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
             }
         ),
-        dcc.Store(id='light-vector-store', data=update_light_vector()),
     ],
     style={
         "display": "flex",
@@ -44,11 +41,8 @@ app.layout = html.Div(
     }
 )
 
-light_vector = np.random.rand(3).tolist()
-
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
-    global light_vector
     data = request.get_json()
 
     light_vector = data["light_vector"]
@@ -69,41 +63,6 @@ def update_vector():
 
     return flask.Response("Vector updated", status=200)
 
-@app.callback(
-    Output('light-vector-output', 'children'),
-    Input('light-vector-store', 'data')
-)
-def update_output(light_vector):
-    print("Callback1")
-    return f'Nová hodnota light_vector: {light_vector}'
-
-
-@app.callback(
-    Output('light-vector-store', 'data'), Input('light-vector-store', 'data'),
-    prevent_initial_call=True
-)
-def update_store(light_vector):
-    print("Callback2")
-    return light_vector
-
-
-@app.callback(
-    Output('light-vector-store', 'data'),
-    Input('light-vector-store', 'data'),
-    prevent_initial_call=True
-)
-def update_store(light_vector):
-    if dash.callback_context.triggered:
-        print("Callback3!")
-    return light_vector
-
-
-@app.callback(
-    Output('light-vector-store', 'data'),Input('light-vector-store', 'data'),prevent_initial_call=True
-)
-def update_store(light_vector):
-    print("callback4")
-    return light_vector
 
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)
