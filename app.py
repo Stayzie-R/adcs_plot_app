@@ -56,10 +56,8 @@ def update_vector():
     ]
     graph.on_update(light_vector, sensors)
 
-    print("Emitting graph_update with data:", {
-        'light_vector': light_vector,
-        'sensors': sensors
-    })
+    print("Data received")
+
 
     return flask.Response("Vector updated", status=200)
 
