@@ -66,10 +66,10 @@ def update_vector():
 
 
 
-@app.callback(Output('3d-graph', 'figure'),
-              [Input('interval-component', 'n_intervals')])
-def update_plot(n_intervals):
-    return graph.figure
+# @app.callback(Output('3d-graph', 'figure'),
+#               [Input('interval-component', 'n_intervals')])
+# def update_plot(n_intervals):
+#     return graph.figure
 
 
 if __name__ == "__main__":
