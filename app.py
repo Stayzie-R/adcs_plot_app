@@ -17,6 +17,7 @@ secret_key = os.environ.get("SECRET_KEY", "secret")
 app = dash.Dash(
     __name__,
     server=server,
+    update_title=None,
     suppress_callback_exceptions=True
 )
 
@@ -82,4 +83,4 @@ def update_plot(n_intervals, data_store):
 
 
 if __name__ == "__main__":
-    app.run(debug=config.DEBUG,  update_title=None)
+    app.run(debug=config.DEBUG)
