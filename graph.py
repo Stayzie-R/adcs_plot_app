@@ -4,7 +4,6 @@ import plotly.graph_objs as go
 import numpy as np
 
 import config
-from urllib3.util.wait import select_wait_for_socket
 
 
 class Graph:
@@ -52,6 +51,7 @@ class Graph:
                 range=[0, 10],      # Range of the Y axis
                 fixedrange=True     # Disables zooming on the Y axis
             ),
+
             scene=dict(
                 xaxis=dict(visible=False),       # Hides the X axis in the 3D scene
                 yaxis=dict(visible=False),       # Hides the Y axis in the 3D scene
@@ -81,16 +81,28 @@ class Graph:
         )
         
     def _configure_graph_2d(self):
-        self._fig_3d.update_layout(
+        zoom_factor = 1
+        limit = self._config.BOX_SIZE / zoom_factor
+        self._fig_2d.update_layout(
             title=self._config.GRAPH_2D_TITLE,
             showlegend=False,
             dragmode=False,
             xaxis=dict(
+                range=[-limit, limit],
                 showticklabels=False,
-                fixedrange=True
+                showgrid=False,
+                zeroline=False,
+                visible=False,
+                fixedrange=True,
+                scaleanchor="y",
+                scaleratio=1
             ),
             yaxis=dict(
+                range=[-limit, limit],
                 showticklabels=False,
+                showgrid=False,
+                zeroline=False,
+                visible=False,
                 fixedrange=True
             ),
             scene=dict(
@@ -98,9 +110,11 @@ class Graph:
                 yaxis=dict(visible=False),
                 zaxis=dict(visible=False)
             ),
-            width=500,
+            width=400,
             height=500,
-            margin=dict(l=0, r=0, t=50, b=0)
+            margin=dict(l=0, r=0, t=50, b=0),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
         )
 
     def _init_3d(self):
@@ -118,7 +132,10 @@ class Graph:
         self._create_legend_3d()
 
     def _init_2d(self):
-        self._crete_box_2d()
+        self._create_plane_2d()
+        self._create_cube_2d()
+        self._create_sensor_arrow_2d()
+        self._create_sensors_ellipse_2d()
 
     def _create_box_3d(self):
         """
@@ -146,17 +163,17 @@ class Graph:
                     )
                 ),
 
-    def _create_box_2d(self):
+    def _create_cube_2d(self):
         """
         Creates a simple 2D cube and adds it to the 2D plot.
         """
-        radius = [-self._config.BOX_SIZE, self._config.BOX_SIZE]
+        radius = [-self._config.BOX_SIZE/2, self._config.BOX_SIZE/2]
         x_values = np.array([radius[0], radius[1], radius[1], radius[0], radius[0]])
         y_values = np.array([radius[0], radius[0], radius[1], radius[1], radius[0]])
 
         self._fig_2d.add_trace(go.Scatter(
             x=x_values, y=y_values, mode='lines',
-            line=dict(color=self._config.BOX_COLOR, width=self._config.BOX_LINEWIDTH)
+            line=dict(color=self._config.CUBE_COLOR, width=self._config.CUBE_LINEWIDTH),
         ))
         
     def _create_plane_3d(self):
@@ -188,6 +205,26 @@ class Graph:
                     )
                 )
             )
+
+    def _create_plane_2d(self):
+        """
+            Adds a semi-transparent square (plane) to the 2D figure.
+            Used as a reference plane, similar to the 3D version.
+            """
+        if self._config.ALLOW_PLANE:
+            radius = self._config.BOX_SIZE/3 * self._config.PLANE_SCALE_FACTOR
+            x_values = [-radius, radius, radius, -radius, -radius]
+            y_values = [-radius, -radius, radius, radius, -radius]
+
+            self._fig_2d.add_trace(go.Scatter(
+                x=x_values,
+                y=y_values,
+                fill='toself',
+                fillcolor="#F5F5F5",
+                line=dict(color='rgba(0,0,0,0)'),
+                hoverinfo='none',
+                showlegend=False
+            ))
 
     def _create_sensors_arrow_3d(self):
         """
@@ -225,6 +262,33 @@ class Graph:
                 hoverinfo='none'
             )
             self._fig_3d.add_trace(arrow_trace)
+
+    def _create_sensor_arrow_2d(self):
+        """
+        Adds dashed arrows from the center of the cube outward, extending 0.5 * BOX_SIZE beyond the edge.
+        """
+        length = self._config.BOX_SIZE * 1.5
+
+        directions = [
+            (1, 0),
+            (-1, 0),
+            (0, 1),
+            (0, -1),
+        ]
+
+        for nx, ny in directions:
+            ex, ey = nx * length / 2, ny * length / 2
+            self._fig_2d.add_trace(go.Scatter(
+                x=[0, ex], y=[0, ey],
+                mode='lines',
+                line=dict(
+                    color='black',
+                    width=0.5,
+                    dash="dot"
+                ),
+                showlegend=False,
+                hoverinfo='none'
+            ))
 
     def _create_sensors_ellipse_3d(self):
         """
@@ -299,6 +363,43 @@ class Graph:
                 radius_minor=self._config.SENSOR_RADIUS_MINOR,
             )
 
+    def _create_sensors_ellipse_2d(self):
+        """
+        Draws 2D circles at the centers of each wall where sensors are located.
+        """
+
+        def create_ellipse(center_x, center_y, radius_x, radius_y, resolution=100):
+            theta = np.linspace(0, 2 * np.pi, resolution)
+            x = center_x + radius_x * np.cos(theta)
+            y = center_y + radius_y * np.sin(theta)
+            return x, y
+
+
+        for color, (x_dir, y_dir, z_dir) in self._config.SENSORS.items():
+            if not color:
+                continue
+            center_x = x_dir * self._config.BOX_SIZE/2
+            center_y = y_dir * self._config.BOX_SIZE/2
+
+            if center_x == 0:
+                radius_major = self._config.BOX_SIZE * .06
+                radius_minor = self._config.BOX_SIZE * .04
+            else:
+                radius_major = self._config.BOX_SIZE * .04
+                radius_minor = self._config.BOX_SIZE * .06
+
+            x, y = create_ellipse(center_x, center_y, radius_major, radius_minor)
+
+            self._fig_2d.add_trace(go.Scatter(
+                x=x, y=y,
+                mode='lines',
+                fill='toself',
+                fillcolor=self._config.LEGEND_COLORS.get(color, 'white'),
+                line=dict(color='black', width=1),
+                name=color,
+                showlegend=False,
+            ))
+
     def _create_legend_3d(self):
         """
         Add invisible 3D scatter traces to the figure to serve as legend entries
@@ -354,6 +455,8 @@ class Graph:
         self._update_light_vec_3d()
         self._update_legend_3d()
 
+        self._update_light_vec_2d()
+
     def _update_light_vec_3d(self):
         """
         Update or create the light vector arrow in the 3D figure.
@@ -403,6 +506,45 @@ class Graph:
                 **arrow_properties
             )
             self._fig_3d.add_trace(vec_trace)
+
+    def _update_light_vec_2d(self):
+        """
+        Adds or updates the light vector arrow in the 2D figure.
+        """
+        target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH
+        vec = self.convert_real_to_dash_coordinates(self.light_vector)
+        vec = np.array(vec)
+        vec_len = np.linalg.norm(vec[:2])
+
+        if vec_len != 0:
+            scaled_vec = vec[:2] / vec_len * target_length
+        else:
+            scaled_vec = vec[:2]
+
+        vector_traces = [
+            trace for trace in self._fig_2d.data if trace.name == 'light_vector'
+        ]
+
+        if vector_traces:
+            for arrow_trace in vector_traces:
+                arrow_trace.x = [0, scaled_vec[0]]
+                arrow_trace.y = [0, scaled_vec[1]]
+        else:
+            arrow_properties = dict(
+                line=dict(
+                    color=self._config.LIGHT_VECTOR_COLOR,
+                    width=self._config.LIGHT_VECTOR_WIDTH
+                )
+            )
+            vec_trace = go.Scatter(
+                x=[0, scaled_vec[0]],
+                y=[0, scaled_vec[1]],
+                mode='lines',
+                name='light_vector',
+                showlegend=False,
+                **arrow_properties
+            )
+            self._fig_2d.add_trace(vec_trace)
 
     def _update_legend_3d(self):
         """
