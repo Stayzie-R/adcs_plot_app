@@ -90,7 +90,7 @@ def update_plot(n_intervals, data_store):
         print("No update")
         raise PreventUpdate
     print("UPDATE GRAPH")
-    return graph.figure_3d
+    return graph.figure_3d, graph.figure_2d
 
 
 if __name__ == "__main__":
