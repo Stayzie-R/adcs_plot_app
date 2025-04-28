@@ -461,8 +461,8 @@ git remote -v
         real-world (physics-based) conventions:
           - In real-world systems:
               * X axis points right
-              * Y axis points up
-              * Z axis points towards the observer (out of the screen)
+              * Y points towards the observer (out of the screen)
+              * Z axis points up
           - In Dash 3D plots:
               * X axis points right
               * Y axis points INTO the screen
@@ -477,6 +477,6 @@ git remote -v
         """
         x_real, y_real, z_real = real_vector
         dash_x = x_real
-        dash_y = -z_real
-        dash_z = y_real
-        return dash_x, dash_y, dash_z
+        dash_y = -y_real
+        dash_z = z_real
+        return (dash_x, dash_y, dash_z)

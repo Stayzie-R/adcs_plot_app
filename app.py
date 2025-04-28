@@ -60,7 +60,6 @@ def update_vector():
         }
         for sensor in data["sensors"]
     ]
-    print("data received")
     graph.on_update(light_vector, sensors)
     app.layout['data-store'].data['update'] = True
     return jsonify({"status": "success", "message": "Data received and processed"})
@@ -70,9 +69,8 @@ def update_vector():
 @app.callback(Output('3d-graph', 'figure'),
               [Input('interval-component', 'n_intervals')])
 def update_plot(n_intervals):
-    if app.layout['data-store'].data['update']:
-        app.layout['data-store'].data['update'] = False
-        return graph.figure
+    return graph.figure
+
 
 
 if __name__ == "__main__":
