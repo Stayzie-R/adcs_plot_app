@@ -428,7 +428,7 @@ class Graph:
                 )
                 self._fig_3d.add_trace(legend_trace)
 
-    def _on_update(self, light_vector, sensors_received):
+    def on_update(self, light_vector, sensors_received):
         """
         Updates the sensor data and light vector based on received input,
         validates the data, and updates the corresponding elements in the plot.
