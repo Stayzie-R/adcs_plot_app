@@ -35,7 +35,7 @@ class Graph:
         """
         Set up the graph's properties
         """
-        self._fig.update_layout(
+        self._fig_3d.update_layout(
             title=self._config.GRAPH_3D_TITLE,
             uirevision='constant',  # Keeps the layout intact when the data is updated
             dragmode='turntable',
@@ -103,7 +103,7 @@ class Graph:
         for s, e in combinations(np.array(list(product(radius, radius, radius))), 2):
             if np.sum(np.abs(s - e)) == radius[1] - radius[0]:
                 pos = [list(pair) for pair in zip(s, e)]
-                self._fig.add_trace(
+                self._fig_3d.add_trace(
                     go.Scatter3d(
                         x=pos[0], y=pos[1], z=pos[2],
                         mode='lines',
@@ -130,7 +130,7 @@ class Graph:
             y_values = self._config.PLANE_SCALE_FACTOR * np.linspace(radius, radius, 1)
             x_mesh, y_mesh = np.meshgrid(x_values, y_values)
             z_mesh = np.ones_like(x_mesh) * -self._config.BOX_SIZE
-            self._fig.add_trace(
+            self._fig_3d.add_trace(
                 go.Surface(
                     x=x_mesh, y=y_mesh, z=z_mesh,
                     colorscale=[self._config.PLANE_COLOR] * len(x_mesh.flatten()),
@@ -180,7 +180,7 @@ class Graph:
                 showlegend=False,
                 hoverinfo='none'
             )
-            self._fig.add_trace(arrow_trace)
+            self._fig_3d.add_trace(arrow_trace)
 
     def _create_sensors_ellipse_3d(self):
         """
@@ -219,7 +219,7 @@ class Graph:
             z = np.append(z, center[2])
 
             if color:
-                self._fig.add_trace(go.Mesh3d(
+                self._fig_3d.add_trace(go.Mesh3d(
                     x=x, y=y, z=z,
                     i=i, j=j, k=k,
                     color=self._config.LEGEND_COLORS[color],
@@ -229,7 +229,7 @@ class Graph:
                 ))
 
             if color:
-                self._fig.add_trace(go.Scatter3d(
+                self._fig_3d.add_trace(go.Scatter3d(
                     x=np.append(x[:-1], x[0]),
                     y=np.append(y[:-1], y[0]),
                     z=np.append(z[:-1], z[0]),
@@ -281,7 +281,7 @@ class Graph:
                     showlegend=True,
                     name=f'Sensor {index + 1}: {str(sensor['value'])}'
                 )
-                self._fig.add_trace(legend_trace)
+                self._fig_3d.add_trace(legend_trace)
 
     def _on_update(self, light_vector, sensors_received):
         """
@@ -333,7 +333,7 @@ class Graph:
             scaled_vec = vec
 
         vector_traces = [
-            trace for trace in self._fig.data if trace.name == 'light_vector'
+            trace for trace in self._fig_3d.data if trace.name == 'light_vector'
         ]
 
 
@@ -358,13 +358,13 @@ class Graph:
                 showlegend=False,
                 **arrow_properties
             )
-            self._fig.add_trace(vec_trace)
+            self._fig_3d.add_trace(vec_trace)
 
     def _update_legend_3d(self):
         """
         Update the legend entries in the 3D figure to reflect current sensor values.
         """
-        legends = [trace for trace in self._fig.data if trace.name is not None and 'Sensor' in trace.name]
+        legends = [trace for trace in self._fig_3d.data if trace.name is not None and 'Sensor' in trace.name]
         for it, legend in enumerate(legends):
             legend.name = f'Sensor {str(it + 1)}: {str(self.sensors[it]["value"])} V'
 
@@ -387,7 +387,7 @@ class Graph:
         """
         self.light_vector = [0, 0, 0]
         self.sensor_values = [0] * len(self.sensors)
-        vector_traces = [trace for trace in self._fig.data if trace.name == 'light_vector']
+        vector_traces = [trace for trace in self._fig_3d.data if trace.name == 'light_vector']
         if vector_traces:
             for arrow_trace in vector_traces:
                 arrow_trace.x = [0, 0]
@@ -399,7 +399,7 @@ class Graph:
         Resets the labels of all sensor legends to the default value '0 V'.
         This can be used when removing the light vector or resetting the graph.
         """
-        legends = [trace for trace in self._fig.data if trace.name is not None and 'Sensor' in trace.name]
+        legends = [trace for trace in self._fig_3d.data if trace.name is not None and 'Sensor' in trace.name]
         for it, legend in enumerate(legends):
             legend.name = f'Sensor {str(it + 1)}: {str(0)} V'
 
@@ -410,7 +410,7 @@ class Graph:
         This property returns the figure associated with the Graph instance,
         allowing for further customization or rendering.
         """
-        return self._fig
+        return self._fig_3d
 
 
     def _validate_light_vector(self, vector):
