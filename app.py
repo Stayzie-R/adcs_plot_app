@@ -72,6 +72,5 @@ def update_plot(n_intervals):
     return graph.figure
 
 
-
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)

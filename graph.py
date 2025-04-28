@@ -410,6 +410,7 @@ class Graph:
         allowing for further customization or rendering.
         """
         return self._fig
+    
 
     def _validate_light_vector(self, vector):
         """
