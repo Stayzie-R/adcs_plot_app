@@ -4,6 +4,8 @@ import plotly.graph_objs as go
 import numpy as np
 
 import config
+from urllib3.util.wait import select_wait_for_socket
+
 
 class Graph:
     """
@@ -30,6 +32,9 @@ class Graph:
         self._configure_graph_3d()
         self._init_3d()
 
+        self._fig_2d = go.Figure()
+        self._configure_graph_2d()
+        self._init_2d()
 
     def _configure_graph_3d(self):
         """
@@ -74,6 +79,29 @@ class Graph:
             ),
             hovermode=False,
         )
+        
+    def _configure_graph_2d(self):
+        self._fig_3d.update_layout(
+            title=self._config.GRAPH_2D_TITLE,
+            showlegend=False,
+            dragmode=False,
+            xaxis=dict(
+                showticklabels=False,
+                fixedrange=True
+            ),
+            yaxis=dict(
+                showticklabels=False,
+                fixedrange=True
+            ),
+            scene=dict(
+                xaxis=dict(visible=False),
+                yaxis=dict(visible=False),
+                zaxis=dict(visible=False)
+            ),
+            width=500,
+            height=500,
+            margin=dict(l=0, r=0, t=50, b=0)
+        )
 
     def _init_3d(self):
         """
@@ -88,6 +116,9 @@ class Graph:
         self._create_sensors_arrow_3d()
         self._create_sensors_ellipse_3d()
         self._create_legend_3d()
+
+    def _init_2d(self):
+        self._crete_box_2d()
 
     def _create_box_3d(self):
         """
@@ -115,6 +146,19 @@ class Graph:
                     )
                 ),
 
+    def _create_box_2d(self):
+        """
+        Creates a simple 2D cube and adds it to the 2D plot.
+        """
+        radius = [-self._config.BOX_SIZE, self._config.BOX_SIZE]
+        x_values = np.array([radius[0], radius[1], radius[1], radius[0], radius[0]])
+        y_values = np.array([radius[0], radius[0], radius[1], radius[1], radius[0]])
+
+        self._fig_2d.add_trace(go.Scatter(
+            x=x_values, y=y_values, mode='lines',
+            line=dict(color=self._config.BOX_COLOR, width=self._config.BOX_LINEWIDTH)
+        ))
+        
     def _create_plane_3d(self):
         """
         Adds a semi-transparent horizontal plane to the 3D figure.
@@ -407,11 +451,19 @@ class Graph:
     def figure_3d(self):
         """Retrieve the current Plotly Figure object.
 
-        This property returns the figure associated with the Graph instance,
-        allowing for further customization or rendering.
+        This property returns the figure associated with the 3D Graph instance,
+        allowing for further rendering.
         """
         return self._fig_3d
 
+    @property
+    def figure_2d(self):
+        """Retrieve the current Plotly Figure object.
+
+        This property returns the figure associated with the 3D Graph instance,
+        allowing for further rendering.
+        """
+        return self._fig_2d
 
     def _validate_light_vector(self, vector):
         """

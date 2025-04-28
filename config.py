@@ -5,7 +5,7 @@ RELOAD_INTERVAL = 500
 
 
 GRAPH_3D_TITLE = "ADCS 3D Visualization"
-
+GRAPH_2D_TITLE = "Top View Projection"
 BOX_SIZE = 1
 BOX_COLOR = 'black'
 BOX_LINEWIDTH = .7
