@@ -29,7 +29,7 @@ app.layout = html.Div(
     children=[
         dcc.Graph(
             id="3d-graph",
-            figure=graph.figure,
+            figure=graph.figure_3d,
             style={
                 "margin": "auto",
                 "display": "block"
@@ -79,7 +79,7 @@ def update_plot(n_intervals, data_store):
         print("No update")
         raise PreventUpdate
     print("UPDATE GRAPH")
-    return graph.figure
+    return graph.figure_3d
 
 
 if __name__ == "__main__":
