@@ -240,6 +240,7 @@ class Graph:
 
         for it, sensor in enumerate(self.sensors):
             vector = sensor["vector"]
+            vector = self.convert_real_to_dash_coordinates(vector)
             vec = np.array(vector)
             center = vec * self._config.BOX_SIZE
             axis = ['x', 'y', 'z'][np.argmax(np.abs(vec))]
@@ -321,7 +322,8 @@ class Graph:
         `self.light_vector`, using styling properties defined in the config.py.
         """
         target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH
-        vec = np.array(self.light_vector)
+        vec = self.convert_real_to_dash_coordinates(self.light_vector)
+        vec = np.array(vec)
         vec_len = np.linalg.norm(vec)
 
         if vec_len != 0:
@@ -450,3 +452,31 @@ git remote -v
             ),
             None
         )
+
+    def convert_real_to_dash_coordinates(self, real_vector):
+        """
+        Converts a real-world vector into Plotly Dash 3D coordinate system.
+
+        Plotly Dash uses a different 3D coordinate system compared to typical
+        real-world (physics-based) conventions:
+          - In real-world systems:
+              * X axis points right
+              * Y axis points up
+              * Z axis points towards the observer (out of the screen)
+          - In Dash 3D plots:
+              * X axis points right
+              * Y axis points INTO the screen
+              * Z axis points up
+        Args:
+            real_vector (tuple or list of float):
+                The real-world vector (x, y, z) to be converted.
+
+        Returns:
+            tuple of float:
+                Converted vector (dash_x, dash_y, dash_z) suitable for Dash plotting.
+        """
+        x_real, y_real, z_real = real_vector
+        dash_x = x_real
+        dash_y = -z_real
+        dash_z = y_real
+        return dash_x, dash_y, dash_z

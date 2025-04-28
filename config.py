@@ -1,6 +1,6 @@
 
 
-DEBUG = True
+DEBUG = False
 RELOAD_INTERVAL = 500
 
 BOX_SIZE = 1
