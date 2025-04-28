@@ -25,6 +25,7 @@ graph = Graph()
 
 app.layout = html.Div(
     children=[
+        html.Title("ADCS visualization"),
         dcc.Graph(
             id="3d-graph",
             figure=graph.figure,
