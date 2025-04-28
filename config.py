@@ -3,6 +3,9 @@
 DEBUG = False
 RELOAD_INTERVAL = 500
 
+
+GRAPH_3D_TITLE = "ADCS 3D Visualization"
+
 BOX_SIZE = 1
 BOX_COLOR = 'black'
 BOX_LINEWIDTH = .7

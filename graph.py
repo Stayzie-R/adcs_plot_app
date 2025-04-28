@@ -26,16 +26,17 @@ class Graph:
             for color, vector in self._config.SENSORS.items()
         ]
 
-        self._fig = go.Figure()
-        self._configure_graph()
-        self._plot_static_object()
+        self._fig_3d = go.Figure()
+        self._configure_graph_3d()
+        self._init_3d()
 
-    def _configure_graph(self):
+
+    def _configure_graph_3d(self):
         """
         Set up the graph's properties
         """
         self._fig.update_layout(
-            title="ADCS",
+            title=self._config.GRAPH_3D_TITLE,
             uirevision='constant',  # Keeps the layout intact when the data is updated
             dragmode='turntable',
             xaxis=dict(
@@ -74,7 +75,7 @@ class Graph:
             hovermode=False,
         )
 
-    def _plot_static_object(self):
+    def _init_3d(self):
         """
         Plots all static elements of the 3D scene, including the box, base plane,
         sensor direction arrows, sensor ellipses, and the legend.
@@ -82,13 +83,13 @@ class Graph:
         This method is typically called once during initialization or when the
         scene needs to be redrawn with static components that do not change dynamically.
         """
-        self._create_box()
-        self._create_plane()
-        self._create_sensors_arrow()
-        self._create_sensors_ellipse()
-        self._create_legend()
+        self._create_box_3d()
+        self._create_plane_3d()
+        self._create_sensors_arrow_3d()
+        self._create_sensors_ellipse_3d()
+        self._create_legend_3d()
 
-    def _create_box(self):
+    def _create_box_3d(self):
         """
         Adds a static 3D box outline to the figure.
 
@@ -114,7 +115,7 @@ class Graph:
                     )
                 ),
 
-    def _create_plane(self):
+    def _create_plane_3d(self):
         """
         Adds a semi-transparent horizontal plane to the 3D figure.
 
@@ -144,7 +145,7 @@ class Graph:
                 )
             )
 
-    def _create_sensors_arrow(self):
+    def _create_sensors_arrow_3d(self):
         """
         Add directional arrows representing sensor vectors to the 3D figure.
 
@@ -181,7 +182,7 @@ class Graph:
             )
             self._fig.add_trace(arrow_trace)
 
-    def _create_sensors_ellipse(self):
+    def _create_sensors_ellipse_3d(self):
         """
         Draws 2D ellipses on the surfaces of the box, centered at the positions
         where the SENSOR_VECTORS intersect the box walls.
@@ -254,7 +255,7 @@ class Graph:
                 radius_minor=self._config.SENSOR_RADIUS_MINOR,
             )
 
-    def _create_legend(self):
+    def _create_legend_3d(self):
         """
         Add invisible 3D scatter traces to the figure to serve as legend entries
         for each sensor.
@@ -282,7 +283,7 @@ class Graph:
                 )
                 self._fig.add_trace(legend_trace)
 
-    def on_update(self, light_vector, sensors_received):
+    def _on_update(self, light_vector, sensors_received):
         """
         Updates the sensor data and light vector based on received input,
         validates the data, and updates the corresponding elements in the plot.
@@ -306,10 +307,10 @@ class Graph:
         self._validate_light_vector(light_vector)
         self.light_vector = light_vector
 
-        self._graph_update_light_vec()
-        self._graph_update_legend()
+        self._update_light_vec_3d()
+        self._update_legend_3d()
 
-    def _graph_update_light_vec(self):
+    def _update_light_vec_3d(self):
         """
         Update or create the light vector arrow in the 3D figure.
 
@@ -359,7 +360,7 @@ class Graph:
             )
             self._fig.add_trace(vec_trace)
 
-    def _graph_update_legend(self):
+    def _update_legend_3d(self):
         """
         Update the legend entries in the 3D figure to reflect current sensor values.
         """
@@ -375,10 +376,10 @@ class Graph:
         current sensor data is no longer needed, effectively clearing it
         from the 3D graph.
         """
-        self._graph_remove_light_vec()
-        self._graph_remove_legend()
+        self._remove_light_vec_3d()
+        self._remove_legend_3d()
 
-    def _graph_remove_light_vec(self):
+    def _remove_light_vec_3d(self):
         """
         Removes the light vector trace from the graph by resetting it to zero length.
         Additionally updates internal state by resetting the light vector to [0, 0, 0]
@@ -393,7 +394,7 @@ class Graph:
                 arrow_trace.y = [0, 0]
                 arrow_trace.z = [0, 0]
 
-    def _graph_remove_legend(self):
+    def _graph_remove_legend_3d(self):
         """
         Resets the labels of all sensor legends to the default value '0 V'.
         This can be used when removing the light vector or resetting the graph.
@@ -403,14 +404,14 @@ class Graph:
             legend.name = f'Sensor {str(it + 1)}: {str(0)} V'
 
     @property
-    def figure(self):
+    def figure_3d(self):
         """Retrieve the current Plotly Figure object.
 
         This property returns the figure associated with the Graph instance,
         allowing for further customization or rendering.
         """
         return self._fig
-    
+
 
     def _validate_light_vector(self, vector):
         """
