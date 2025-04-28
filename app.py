@@ -22,6 +22,7 @@ app = dash.Dash(
 
 graph = Graph()
 
+app.title = "ADCS - 3D Visualization" 
 app.layout = html.Div(
     children=[
         dcc.Graph(
