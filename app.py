@@ -82,4 +82,4 @@ def update_plot(n_intervals, data_store):
 
 
 if __name__ == "__main__":
-    app.run(debug=config.DEBUG)
+    app.run(debug=config.DEBUG,  update_title=None)
