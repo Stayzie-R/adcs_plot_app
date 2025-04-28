@@ -76,8 +76,10 @@ def update_vector():
     ]
 
     if light_vector == graph.light_vector:
+        print("no change")
         app.layout['data-store'].data['update'] = False
     else:
+        print("change")
         graph.on_update(light_vector, sensors)
         app.layout['data-store'].data['update'] = True
     return jsonify({"status": "success", "message": "Data received and processed"})
@@ -87,9 +89,9 @@ def update_vector():
               [Input('interval-component', 'n_intervals'),Input('data-store', 'data')])
 def update_plot(n_intervals, data_store):
     if not data_store['update']:
-        print("No update")
+        #print("No update")
         raise PreventUpdate
-    print("UPDATE GRAPH")
+    #print("Update")
     return graph.figure_3d, graph.figure_2d
 
 
