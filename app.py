@@ -60,15 +60,23 @@ def update_vector():
         }
         for sensor in data["sensors"]
     ]
-    graph.on_update(light_vector, sensors)
-    app.layout['data-store'].data['update'] = True
+
+    if light_vector == graph.current_light_vector:
+        app.layout['data-store'].data['update'] = False
+    else:
+        graph.on_update(light_vector, sensors)
+        app.layout['data-store'].data['update'] = True
     return jsonify({"status": "success", "message": "Data received and processed"})
 
 
-
 @app.callback(Output('3d-graph', 'figure'),
-              [Input('interval-component', 'n_intervals')])
-def update_plot(n_intervals):
+              [Input('interval-component', 'n_intervals'),
+               Input('data-store', 'data')])  # Sleduj změny v data-store
+def update_plot(n_intervals, data_store):
+    if not data_store['update']:
+        print("No update")
+        raise PreventUpdate
+    print("UPDATE GRAPH")
     return graph.figure
 
 
