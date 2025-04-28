@@ -17,7 +17,6 @@ secret_key = os.environ.get("SECRET_KEY", "secret")
 app = dash.Dash(
     __name__,
     server=server,
-    update_title="ADCS",
     suppress_callback_exceptions=True
 )
 
@@ -25,7 +24,6 @@ graph = Graph()
 
 app.layout = html.Div(
     children=[
-        html.Title("_ADCS_"),
         dcc.Graph(
             id="3d-graph",
             figure=graph.figure,
@@ -72,7 +70,7 @@ def update_vector():
 
 @app.callback(Output('3d-graph', 'figure'),
               [Input('interval-component', 'n_intervals'),
-               Input('data-store', 'data')])  # Sleduj změny v data-store
+               Input('data-store', 'data')])
 def update_plot(n_intervals, data_store):
     if not data_store['update']:
         print("No update")
