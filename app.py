@@ -52,8 +52,8 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom3d', 'pan3d', 'select3d', 'lasso3d', 'resetCameraLastSave3d', 'resetCameraDefault3d']
             }
         ),
+        dcc.Store(id='camera-store'),
         dcc.Interval(id='interval-component',interval=1000),
-        dcc.Store(id='data-store', data={'update': False})
     ],
     style={
         "display": "flex",
@@ -78,25 +78,30 @@ def update_vector():
         for sensor in data["sensors"]
     ]
 
-    if light_vector == graph.light_vector:
-        app.layout['data-store'].data['update'] = False
-    else:
-        graph.on_update(light_vector, sensors)
-        app.layout['data-store'].data['update'] = True
+    graph.on_update(light_vector, sensors)
     return jsonify({"status": "success", "message": "Data received and processed"})
 
 
-@app.callback([Output('3d-graph', 'figure'),Output('2d-graph', 'figure')],
-              [Input('interval-component', 'n_intervals'),Input('data-store', 'data')])
-def update_plot(n_intervals, data_store):
-    # print(data_store['update'])
-    # if not data_store['update']:
-    #     #print("No update")
-    #     raise PreventUpdate
-    # #print("Update")
+@app.callback([Output('3d-graph', 'figure'),
+               Output('2d-graph', 'figure'),
+               Output('camera-store', 'data')],
+              [Input('interval-component', 'n_intervals')],
+              [State('3d-graph', 'relayoutData')])
+def update_plot(n_intervals, relayout_data):
+    if relayout_data is None:
+        camera_state = {}
+    else:
+        camera_state = relayout_data.get('scene', {}).get('camera', {})
+
     print("updating vector: ", str(graph.light_vector))
-    return graph.figure_3d, graph.figure_2d
+
+    figure_3d = graph.figure_3d
+    figure_2d = graph.figure_2d
+    if camera_state:
+        figure_3d['layout']['scene']['camera'] = camera_state
+
+    return figure_3d, figure_2d, camera_state
 
 
 if __name__ == "__main__":
-    app.run(debug=config.DEBUG,use_reloader=False)
+    app.run(debug=config.DEBUG)
