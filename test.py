@@ -38,7 +38,7 @@ def update_vector():
     return jsonify({"status": "success", "message": "Data received and processed"})
 
 @app.callback(Output('graph', 'figure'),
-              [Input('interval-component', 'n_intervals'))
+              Input('interval-component', 'n_intervals'))
 def update_plot(n_intervals, data_store):
     print("updating vector: ", str(graph.light_vector))
     return graph.fig
