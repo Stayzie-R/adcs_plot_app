@@ -5,9 +5,9 @@ import dash
 from dash import dcc, html, Output, Input
 from TestGraph import TestGraph
 import flask
-from flask import jsonify
-
+from flask import request, jsonify, Response
 import logging
+
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 server = flask.Flask(__name__)
