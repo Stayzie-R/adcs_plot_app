@@ -435,7 +435,7 @@ class Graph:
         self._fig_3d.add_annotation(
             text=self._config.LIGHT_VEC_ANNOT,
             xref="paper", yref="paper",
-            x=.5, y=0.8,
+            x=1, y=0.8,
             showarrow=False,
             font=dict(size=12)
         )
