@@ -2,7 +2,7 @@
 import os
 
 import dash
-from dash import dcc, html
+from dash import dcc, html, Output, Input
 from TestGraph import TestGraph
 import flask
 from flask import jsonify
