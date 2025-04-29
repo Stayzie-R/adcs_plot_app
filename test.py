@@ -29,20 +29,28 @@ app.layout = html.Div(
         dcc.Interval(id='interval-component',interval=1000),
     ],
 )
+state_lock = threading.Lock()
+
+state = {
+    "light_vector": [0.0, 0.0, 0.0]
+}
 
 @app.server.route('/test', methods=['POST'])
 def update_vector():
     data = request.get_json()
-    light_vector = data["light_vector"]
-    graph.update_vector(light_vector)
-    print("received vector: ", str(graph.light_vector))
+    with state_lock:
+        state["light_vector"] = data["light_vector"]
+        print("received vector: ", str(graph.light_vector))
     return jsonify({"status": "success", "message": "Data received and processed"})
 
 
 @app.callback(Output('graph', 'figure'),
               Input('interval-component', 'n_intervals'))
 def update_plot(n_intervals):
-    print("updating vector: ", str(graph.light_vector))
+    with state_lock:
+        print("updating vector: ", str(graph.light_vector))
+        vector = state["light_vector"]
+        graph.update_vector(vector)
     return graph.fig
 
 
