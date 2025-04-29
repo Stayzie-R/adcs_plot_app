@@ -86,11 +86,11 @@ def update_vector():
 @app.callback([Output('3d-graph', 'figure'),Output('2d-graph', 'figure')],
               [Input('interval-component', 'n_intervals'),Input('data-store', 'data')])
 def update_plot(n_intervals, data_store):
-    print(data_store['update'])
-    if not data_store['update']:
-        #print("No update")
-        raise PreventUpdate
-    #print("Update")
+    # print(data_store['update'])
+    # if not data_store['update']:
+    #     #print("No update")
+    #     raise PreventUpdate
+    # #print("Update")
     return graph.figure_3d, graph.figure_2d
 
 
