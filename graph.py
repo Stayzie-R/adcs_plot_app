@@ -40,9 +40,17 @@ class Graph:
         Set up the graph's properties
         """
         self._fig_3d.update_layout(
-            title=self._config.GRAPH_3D_TITLE,
+            title=dict(
+                text=self._config.GRAPH_3D_TITLE,
+                font=dict(size=18),
+                x=0.5,
+                y=0.8,  # Adjust the title's vertical position (0 is bottom, 1 is top)
+                xanchor='right',
+                yanchor='top'
+            ),
             uirevision='constant',  # Keeps the layout intact when the data is updated
             dragmode='turntable',
+            showlegend=False,
             xaxis=dict(
                 range=[0, 10],      # Range of the X axis
                 fixedrange=True     # Disables zooming on the X axis
@@ -63,21 +71,6 @@ class Graph:
             width=500,                           # Width of the graph in pixels
             height=500,                          # Height of the graph in pixels
             margin=dict(l=0, r=0, t=50, b=0),    # Margins around the graph
-            legend=dict(
-                x=1,  # Position to the right (x=1)
-                y=0,  # Position at the bottom (y=0)
-                traceorder='normal',  # The order of legend items based on their addition
-                font=dict(color=self._config.LEGEND_ITEM_COLOR, size=self._config.LEGEND_ITEM_SIZE),
-                title=dict(
-                    text=self._config.LEGEND_TITLE,  # Title of the legend
-                    font=dict(size=self._config.LEGEND_TITLE_SIZE , color=self._config.LEGEND_TITLE_COLOR),
-                    side="top"  # Position of the title
-                ),
-                
-                itemclick=False,
-                itemdoubleclick=False,
-
-            ),
             hovermode=False,
         )
         
@@ -85,8 +78,15 @@ class Graph:
         zoom_factor = 1
         limit = self._config.BOX_SIZE / zoom_factor
         self._fig_2d.update_layout(
-            title=self._config.GRAPH_2D_TITLE,
-            showlegend=False,
+            title=dict(
+                text=self._config.GRAPH_2D_TITLE,
+                font=dict(size=18),
+                x=0.5,
+                y=0.8,  # Adjust the title's vertical position (0 is bottom, 1 is top)
+                xanchor='right',
+                yanchor='top'
+            ),
+            showlegend=True,
             dragmode=False,
             xaxis=dict(
                 range=[-limit, limit],
@@ -116,6 +116,19 @@ class Graph:
             margin=dict(l=0, r=0, t=50, b=0),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
+            legend=dict(
+                x=1,  # Position to the right (x=1)
+                y=0,  # Position at the bottom (y=0)
+                traceorder='normal',  # The order of legend items based on their addition
+                font=dict(color=self._config.LEGEND_ITEM_COLOR, size=self._config.LEGEND_ITEM_SIZE),
+                title=dict(
+                    text=self._config.LEGEND_TITLE,  # Title of the legend
+                    font=dict(size=self._config.LEGEND_TITLE_SIZE, color=self._config.LEGEND_TITLE_COLOR),
+                    side="top"  # Position of the title
+                ),
+                itemclick=False,
+                itemdoubleclick=False,
+            ),
         )
 
     def _init_3d(self):
@@ -130,14 +143,15 @@ class Graph:
         self._create_plane_3d()
         self._create_sensors_arrow_3d()
         self._create_sensors_ellipse_3d()
-        self._create_legend()
-        self._crete_light_vec_annotation()
 
     def _init_2d(self):
         self._create_plane_2d()
         self._create_cube_2d()
         self._create_sensor_arrow_2d()
         self._create_sensors_ellipse_2d()
+
+        self._create_legend()
+        self._crete_light_vec_annotation()
 
     def _create_box_3d(self):
         """
@@ -176,6 +190,7 @@ class Graph:
         self._fig_2d.add_trace(go.Scatter(
             x=x_values, y=y_values, mode='lines',
             line=dict(color=self._config.CUBE_COLOR, width=self._config.CUBE_LINEWIDTH),
+            showlegend=False
         ))
         
     def _create_plane_3d(self):
@@ -429,12 +444,12 @@ class Graph:
                     showlegend=True,
                     name=f'Sensor {index + 1}: {str(sensor['value'])}'
                 )
-                self._fig_3d.add_trace(legend_trace)
+                self._fig_2d.add_trace(legend_trace)
 
     def _crete_light_vec_annotation(self):
-        base_x = 1.23
-        base_y = 0.8
-
+        legend_position = self._fig_2d.layout.legend
+        base_x = legend_position.x
+        base_y = legend_position.y + .45
 
         annotations = [
             dict(
@@ -442,30 +457,33 @@ class Graph:
                 xref="paper", yref="paper",
                 x=base_x, y=base_y,
                 showarrow=False,
+                xanchor='left',
+                yanchor='top',
                 font=dict(size=self._config.ANNOTATION_TITLE_SIZE, color=self._config.ANNOTATION_TITLE_COLOR),
             ),
             dict(
                 text= str([round(num, 2) for num in self.light_vector]),
                 xref="paper", yref="paper",
-                x=base_x+0.13, y=base_y - 0.045,
+                x=base_x+0.13, y=base_y - 0.065,
                 showarrow=False,
                 bgcolor="rgba(0,0,0,0)",
+                xanchor='righ',
                 font=dict(size=self._config.ANNOTATION_ITEM_SIZE, color=self._config.ANNOTATION_ITEM_COLOR),
             ),
         ]
         for annot in annotations:
-            self._fig_3d.add_annotation(**annot)
+            self._fig_2d.add_annotation(**annot)
 
-        position_x_start = 0.19
-        position_x_end = position_x_start - 0.035
-        self._fig_3d.add_shape(
-            type="line",
-            x0=base_x - position_x_start, y0=base_y-0.07,
-            x1=base_x - position_x_end, y1=base_y-0.07,
-            xref="paper", yref="paper",
-            line=dict(color=self._config.LIGHT_VECTOR_COLOR, width=3.5),
-            layer="above"
-        )
+        # position_x_start = 0.19
+        # position_x_end = position_x_start - 0.035
+        # self._fig_2d.add_shape(
+        #     type="line",
+        #     x0=base_x - position_x_start, y0=base_y-0.07,
+        #     x1=base_x - position_x_end, y1=base_y-0.07,
+        #     xref="paper", yref="paper",
+        #     line=dict(color=self._config.LIGHT_VECTOR_COLOR, width=3.5),
+        #     layer="above"
+        # )
 
     def on_update(self, light_vector, sensors_received):
         """
@@ -496,7 +514,6 @@ class Graph:
 
         self._update_legend()
         self._update_light_vec_annotation()
-
 
     def _update_light_vec_3d(self):
         """
@@ -591,12 +608,12 @@ class Graph:
         """
         Update the legend entries in the 3D figure to reflect current sensor values.
         """
-        legends = [trace for trace in self._fig_3d.data if trace.name is not None and 'Sensor' in trace.name]
+        legends = [trace for trace in self._fig_2d.data if trace.name is not None and 'Sensor' in trace.name]
         for it, legend in enumerate(legends):
             legend.name = f'Sensor {str(it + 1)}: {str(self.sensors[it]["value"])} V'
 
     def _update_light_vec_annotation(self):
-        for annotation in self._fig_3d.layout.annotations:
+        for annotation in self._fig_2d.layout.annotations:
             if isinstance(annotation.text, str) and annotation.text.strip().startswith("[") and annotation.text.strip().endswith("]"):
                 annotation.update(text=str(str([round(num, 2) for num in self.light_vector])))
                 break
@@ -640,12 +657,12 @@ class Graph:
         Resets the labels of all sensor legends to the default value '0 V'.
         This can be used when removing the light vector or resetting the graph.
         """
-        legends = [trace for trace in self._fig_3d.data if trace.name is not None and 'Sensor' in trace.name]
+        legends = [trace for trace in self._fig_2d.data if trace.name is not None and 'Sensor' in trace.name]
         for it, legend in enumerate(legends):
             legend.name = f'Sensor {str(it + 1)}: {str(0)} V'
 
     def _remove_light_vec_annotation(self):
-        for annotation in self._fig_3d.layout.annotations:
+        for annotation in self._fig_2d.layout.annotations:
             if isinstance(annotation.text, str) and annotation.text.strip().startswith("[") and annotation.text.strip().endswith("]"):
                 annotation.update(text=str([0.0,0.0,0.0]))
                 break
