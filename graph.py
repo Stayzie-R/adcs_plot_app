@@ -375,7 +375,8 @@ class Graph:
             return x, y
 
 
-        for color, (x_dir, y_dir, z_dir) in self._config.SENSORS.items():
+        for color, vector in self._config.SENSORS.items():
+            x_dir,y_dir,z_dir = self.convert_real_to_dash_coordinates(vector)
             if not color:
                 continue
             center_x = x_dir * self._config.BOX_SIZE/2
@@ -512,7 +513,7 @@ class Graph:
         Adds or updates the light vector arrow in the 2D figure.
         """
         target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH
-        vec = self.convert_real_to_dash_coordinates(self.light_vector)
+        vec = self.light_vector
         vec = np.array(vec)
         vec_len = np.linalg.norm(vec[:2])
 
@@ -671,8 +672,15 @@ git remote -v
             tuple of float:
                 Converted vector (dash_x, dash_y, dash_z) suitable for Dash plotting.
         """
-        x_real, y_real, z_real = real_vector
-        dash_x = x_real
-        dash_y = -y_real
-        dash_z = z_real
-        return (dash_x, dash_y, dash_z)
+        
+        if len(real_vector) == 3:
+            x_real, y_real, z_real = real_vector
+            dash_x = x_real
+            dash_y = -y_real
+            dash_z = z_real
+            return (dash_x, dash_y, dash_z)
+        else:
+            x_real, y_real = real_vector
+            dash_x = x_real
+            dash_y = -y_real
+            return (dash_x, dash_y)
