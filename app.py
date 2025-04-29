@@ -33,7 +33,7 @@ app.layout = html.Div(
             style={
                 "margin": "0px",
                 "display": "inline-block",
-
+                "padding": "0px"
             },
             config={
                 'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d']
@@ -45,6 +45,7 @@ app.layout = html.Div(
             style={
                 "margin": "0px",
                 "display": "inline-block",
+                "padding": "0px"
             },
             config={
                 'modeBarButtonsToRemove': ['zoom3d', 'pan3d', 'select3d', 'lasso3d', 'resetCameraLastSave3d', 'resetCameraDefault3d']
@@ -62,7 +63,37 @@ app.layout = html.Div(
     }
 )
 
+@app.server.route('/update_vector', methods=['POST'])
+def update_vector():
+    data = request.get_json()
 
+    light_vector = data["light_vector"]
+    sensors = [
+        {
+            "color": sensor["color"],
+            "vector": sensor["vector"],
+            "value": round(sensor["value"], 4)
+        }
+        for sensor in data["sensors"]
+    ]
+
+    if light_vector == graph.light_vector:
+        app.layout['data-store'].data['update'] = False
+    else:
+        graph.on_update(light_vector, sensors)
+        app.layout['data-store'].data['update'] = True
+    return jsonify({"status": "success", "message": "Data received and processed"})
+
+
+@app.callback([Output('3d-graph', 'figure'),Output('2d-graph', 'figure')],
+              [Input('interval-component', 'n_intervals'),Input('data-store', 'data')])
+def update_plot(n_intervals, data_store):
+    # print(data_store['update'])
+    # if not data_store['update']:
+    #     #print("No update")
+    #     raise PreventUpdate
+    # #print("Update")
+    return graph.figure_3d, graph.figure_2d
 
 
 if __name__ == "__main__":
