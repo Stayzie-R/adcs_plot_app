@@ -376,9 +376,9 @@ class Graph:
 
 
         for color, vector in self._config.SENSORS.items():
-            x_dir,y_dir,z_dir = self.convert_real_to_dash_coordinates(vector)
             if not color:
                 continue
+            x_dir, y_dir, z_dir = self.convert_real_to_dash_coordinates(vector)
             center_x = x_dir * self._config.BOX_SIZE/2
             center_y = y_dir * self._config.BOX_SIZE/2
 
