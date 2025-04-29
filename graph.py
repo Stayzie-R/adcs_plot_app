@@ -512,7 +512,7 @@ class Graph:
         """
         Adds or updates the light vector arrow in the 2D figure.
         """
-        target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH
+        target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH_2D
         vec = self.convert_real_to_dash_coordinates(self.light_vector)
         vec = np.array(vec)
         vec_len = np.linalg.norm(vec[:2])
@@ -533,8 +533,8 @@ class Graph:
         else:
             arrow_properties = dict(
                 line=dict(
-                    color=self._config.LIGHT_VECTOR_COLOR,
-                    width=self._config.LIGHT_VECTOR_WIDTH
+                    color=self._config.LIGHT_VECTOR_COLOR_2D,
+                    width=self._config.LIGHT_VECTOR_WIDTH_2D
                 )
             )
             vec_trace = go.Scatter(
