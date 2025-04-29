@@ -34,12 +34,14 @@ app.layout = html.Div(
 def update_vector():
     data = request.get_json()
     light_vector = data["light_vector"]
+    graph.update_vector(light_vector)
     print("received vector: ", str(graph.light_vector))
     return jsonify({"status": "success", "message": "Data received and processed"})
 
+
 @app.callback(Output('graph', 'figure'),
               Input('interval-component', 'n_intervals'))
-def update_plot(n_intervals, data_store):
+def update_plot(n_intervals):
     print("updating vector: ", str(graph.light_vector))
     return graph.fig
 
