@@ -67,10 +67,10 @@ class Graph:
                 x=1,  # Position to the right (x=1)
                 y=0,  # Position at the bottom (y=0)
                 traceorder='normal',  # The order of legend items based on their addition
-                font=dict(size=15, color='#000'),
+                font=dict(size=11, color='#000'),
                 title=dict(
-                    text="Sensor values",  # Title of the legend
-                    font=dict(size=12, color="black"),
+                    text=self._config.LEGEND_TITLE,  # Title of the legend
+                    font=dict(size=13, color="black"),
                     side="top"  # Position of the title
                 ),
                 
@@ -131,6 +131,7 @@ class Graph:
         self._create_sensors_arrow_3d()
         self._create_sensors_ellipse_3d()
         self._create_legend_3d()
+        self._crete_light_vec_annotation()
 
     def _init_2d(self):
         self._create_plane_2d()
@@ -429,6 +430,15 @@ class Graph:
                     name=f'Sensor {index + 1}: {str(sensor['value'])}'
                 )
                 self._fig_3d.add_trace(legend_trace)
+
+    def _crete_light_vec_annotation(self):
+        self._fig_3d.add_annotation(
+            text=self._config.LIGHT_VEC_ANNOT,
+            xref="paper", yref="paper",
+            x=.5, y=0.8,
+            showarrow=False,
+            font=dict(size=12)
+        )
 
     def on_update(self, light_vector, sensors_received):
         """
