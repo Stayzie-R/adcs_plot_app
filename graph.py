@@ -467,7 +467,7 @@ class Graph:
                 x=base_x+0.13, y=base_y - 0.065,
                 showarrow=False,
                 bgcolor="rgba(0,0,0,0)",
-                xanchor='righ',
+                xanchor='left',
                 font=dict(size=self._config.ANNOTATION_ITEM_SIZE, color=self._config.ANNOTATION_ITEM_COLOR),
             ),
         ]
