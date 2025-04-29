@@ -94,6 +94,7 @@ def update_plot(n_intervals, data_store):
     #     #print("No update")
     #     raise PreventUpdate
     # #print("Update")
+    print("vector: ", str(graph.light_vector))
     return graph.figure_3d, graph.figure_2d
 
 
