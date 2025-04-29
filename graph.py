@@ -445,7 +445,7 @@ class Graph:
                 font=dict(size=self._config.ANNOTATION_TITLE_SIZE, color=self._config.ANNOTATION_TITLE_COLOR),
             ),
             dict(
-                text= str(self.light_vector),
+                text= str([round(num, 2) for num in self.light_vector]),
                 xref="paper", yref="paper",
                 x=base_x+0.13, y=base_y - 0.045,
                 showarrow=False,
@@ -597,7 +597,7 @@ class Graph:
     def _update_light_vec_annotation(self):
         for annotation in self._fig_3d.layout.annotations:
             if isinstance(annotation.text, str) and annotation.text.strip().startswith("[") and annotation.text.strip().endswith("]"):
-                annotation.update(text=str(self.light_vector))
+                annotation.update(text=str(str([round(num, 2) for num in self.light_vector])))
                 break
 
     def on_remove(self):
