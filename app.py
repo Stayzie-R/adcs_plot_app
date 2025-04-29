@@ -5,7 +5,7 @@ import flask
 from flask import request, jsonify, Response
 
 import dash
-from dash import dcc, html, Output, Input,State
+from dash import dcc, html, Output, Input, State, no_update
 from dash.exceptions import PreventUpdate
 
 import config
@@ -52,7 +52,7 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom3d', 'pan3d', 'select3d', 'lasso3d', 'resetCameraLastSave3d', 'resetCameraDefault3d']
             }
         ),
-        dcc.Store(id='camera-store'),
+        dcc.Store(id='camera-lock', data=False),
         dcc.Interval(id='interval-component',interval=1000),
     ],
     style={
@@ -82,25 +82,28 @@ def update_vector():
     return jsonify({"status": "success", "message": "Data received and processed"})
 
 
-@app.callback([Output('3d-graph', 'figure'),
-               Output('2d-graph', 'figure'),
-               Output('camera-store', 'data')],
-              [Input('interval-component', 'n_intervals')],
-              [State('3d-graph', 'relayoutData')])
-def update_plot(n_intervals, relayout_data):
-    if relayout_data is None:
-        camera_state = {}
-    else:
-        camera_state = relayout_data.get('scene', {}).get('camera', {})
+
+@app.callback(
+    Output('camera-lock', 'data'),
+    Input('3d-graph', 'relayoutData')
+)
+def lock_camera(relayout_data):
+    if 'scene' in relayout_data and 'camera' in relayout_data['scene']:
+        return True
+    return False
+
+
+@app.callback(
+    [Output('3d-graph', 'figure'), Output('2d-graph', 'figure')],
+    [Input('interval-component', 'n_intervals')],
+    [State('camera-lock', 'data')]
+)
+def update_plot(n_intervals, camera_lock):
+    if camera_lock:
+        return dash.no_update, dash.no_update
 
     print("updating vector: ", str(graph.light_vector))
-
-    figure_3d = graph.figure_3d
-    figure_2d = graph.figure_2d
-    if camera_state:
-        figure_3d['layout']['scene']['camera'] = camera_state
-
-    return figure_3d, figure_2d, camera_state
+    return graph.figure_3d, graph.figure_2d
 
 
 if __name__ == "__main__":
