@@ -597,7 +597,7 @@ class Graph:
     def _update_light_vec_annotation(self):
         for annotation in self._fig_3d.layout.annotations:
             if isinstance(annotation.text, str) and annotation.text.strip().startswith("[") and annotation.text.strip().endswith("]"):
-                annotation.update(text=str(new_vector))
+                annotation.update(text=str(self.light_vector))
                 break
 
     def on_remove(self):
