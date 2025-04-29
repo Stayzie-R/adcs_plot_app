@@ -80,8 +80,8 @@ class Graph:
         self._fig_2d.update_layout(
             title=dict(
                 text=self._config.GRAPH_2D_TITLE,
-                font=dict(size=18),
-                x=0.5,
+                font=dict(size=self._config.TITLE_SIZE),
+                x=0.35,
                 y=0.8,  # Adjust the title's vertical position (0 is bottom, 1 is top)
                 xanchor='right',
                 yanchor='top'
@@ -96,7 +96,7 @@ class Graph:
                 visible=False,
                 fixedrange=True,
                 scaleanchor="y",
-                scaleratio=1
+                scaleratio=1,
             ),
             yaxis=dict(
                 range=[-limit, limit],
@@ -111,13 +111,13 @@ class Graph:
                 yaxis=dict(visible=False),
                 zaxis=dict(visible=False)
             ),
-            width=400,
+            width=600,
             height=500,
-            margin=dict(l=0, r=0, t=50, b=0),
+            margin=dict(l=0, r=300, t=50, b=0),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             legend=dict(
-                x=1,  # Position to the right (x=1)
+                x=1.05,  # Position to the right (x=1)
                 y=0,  # Position at the bottom (y=0)
                 traceorder='normal',  # The order of legend items based on their addition
                 font=dict(color=self._config.LEGEND_ITEM_COLOR, size=self._config.LEGEND_ITEM_SIZE),
@@ -474,16 +474,19 @@ class Graph:
         for annot in annotations:
             self._fig_2d.add_annotation(**annot)
 
-        # position_x_start = 0.19
-        # position_x_end = position_x_start - 0.035
-        # self._fig_2d.add_shape(
-        #     type="line",
-        #     x0=base_x - position_x_start, y0=base_y-0.07,
-        #     x1=base_x - position_x_end, y1=base_y-0.07,
-        #     xref="paper", yref="paper",
-        #     line=dict(color=self._config.LIGHT_VECTOR_COLOR, width=3.5),
-        #     layer="above"
-        # )
+
+        position_x_end =  0.055
+        self._fig_2d.add_shape(
+            type="line",
+            x0=base_x + 0.04, y0=base_y - 0.07,
+            x1=base_x + 0.04 + position_x_end, y1=base_y - 0.07,
+            xref="paper", yref="paper",
+            line=dict(
+                color=self._config.LIGHT_VECTOR_COLOR,
+                width=3.5,
+            ),
+            layer="above"
+        )
 
     def on_update(self, light_vector, sensors_received):
         """
@@ -626,7 +629,7 @@ class Graph:
         current sensor data is no longer needed, effectively clearing it
         from the 3D graph.
         """
-        self.light_vector = [0, 0, 0]
+        self.light_vector = [0.0, 0.0, 0.0]
         self.sensor_values = [0] * len(self.sensors)
         self._remove_light_vec_3d()
         self._remove_light_vec_2d()

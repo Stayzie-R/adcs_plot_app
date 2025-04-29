@@ -45,7 +45,8 @@ app.layout = html.Div(
             style={
                 "margin": "0px",
                 "display": "inline-block",
-                "padding": "0px"
+                "padding": "0px",
+                "margin-left": "0px"
             },
             config={
                 'modeBarButtonsToRemove': ['zoom3d', 'pan3d', 'select3d', 'lasso3d', 'resetCameraLastSave3d', 'resetCameraDefault3d']

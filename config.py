@@ -6,8 +6,9 @@ RELOAD_INTERVAL = 500
 
 GRAPH_3D_TITLE = "ADCS 3D Visualization"
 GRAPH_2D_TITLE = "Top View Projection"
+TITLE_SIZE = 18
 
-LEGEND_TITLE = "Light Sensor Readings"
+LEGEND_TITLE = "Sensor Readings"
 LIGHT_VEC_ANNOT = "Light Vector"
 
 LEGEND_TITLE_SIZE = 14
