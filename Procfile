@@ -1,1 +1,1 @@
-web: gunicorn test:server --access-logfile /dev/null
+web: gunicorn test:server --workers=1 --threads=1
