@@ -130,7 +130,7 @@ class Graph:
         self._create_plane_3d()
         self._create_sensors_arrow_3d()
         self._create_sensors_ellipse_3d()
-        self._create_legend_3d()
+        self._create_legend()
         self._crete_light_vec_annotation()
 
     def _init_2d(self):
@@ -403,7 +403,7 @@ class Graph:
                 showlegend=False,
             ))
 
-    def _create_legend_3d(self):
+    def _create_legend(self):
         """
         Add invisible 3D scatter traces to the figure to serve as legend entries
         for each sensor.
@@ -492,10 +492,11 @@ class Graph:
         self.light_vector = light_vector
 
         self._update_light_vec_3d()
-        self._update_legend_3d()
+        self._update_light_vec_2d()
+
+        self._update_legend()
         self._update_light_vec_annotation()
 
-        self._update_light_vec_2d()
 
     def _update_light_vec_3d(self):
         """
@@ -520,7 +521,7 @@ class Graph:
             scaled_vec = vec
 
         vector_traces = [
-            trace for trace in self._fig_3d.data if trace.name == 'light_vector'
+            trace for trace in self._fig_3d.data if trace.name == 'light_vector_3d'
         ]
 
 
@@ -541,7 +542,7 @@ class Graph:
                 y=[0, scaled_vec[1]],
                 z=[0, scaled_vec[2]],
                 mode='lines',
-                name='light_vector',
+                name='light_vector_3d',
                 showlegend=False,
                 **arrow_properties
             )
@@ -562,7 +563,7 @@ class Graph:
             scaled_vec = vec[:2]
 
         vector_traces = [
-            trace for trace in self._fig_2d.data if trace.name == 'light_vector'
+            trace for trace in self._fig_2d.data if trace.name == 'light_vector_2d'
         ]
 
         if vector_traces:
@@ -580,13 +581,13 @@ class Graph:
                 x=[0, scaled_vec[0]],
                 y=[0, scaled_vec[1]],
                 mode='lines',
-                name='light_vector',
+                name='light_vector_2d',
                 showlegend=False,
                 **arrow_properties
             )
             self._fig_2d.add_trace(vec_trace)
 
-    def _update_legend_3d(self):
+    def _update_legend(self):
         """
         Update the legend entries in the 3D figure to reflect current sensor values.
         """
@@ -608,8 +609,11 @@ class Graph:
         current sensor data is no longer needed, effectively clearing it
         from the 3D graph.
         """
+        self.light_vector = [0, 0, 0]
+        self.sensor_values = [0] * len(self.sensors)
         self._remove_light_vec_3d()
-        self._remove_legend_3d()
+        self._remove_light_vec_2d()
+        self._remove_legend()
 
     def _remove_light_vec_3d(self):
         """
@@ -617,16 +621,21 @@ class Graph:
         Additionally updates internal state by resetting the light vector to [0, 0, 0]
         and setting all sensor values to 0.
         """
-        self.light_vector = [0, 0, 0]
-        self.sensor_values = [0] * len(self.sensors)
-        vector_traces = [trace for trace in self._fig_3d.data if trace.name == 'light_vector']
+        vector_traces = [trace for trace in self._fig_3d.data if trace.name == 'light_vector_3d']
         if vector_traces:
             for arrow_trace in vector_traces:
                 arrow_trace.x = [0, 0]
                 arrow_trace.y = [0, 0]
                 arrow_trace.z = [0, 0]
 
-    def _remove_legend_3d(self):
+    def _remove_light_vec_2d(self):
+        vector_traces = [trace for trace in self._fig_3d.data if trace.name == 'light_vector_2d']
+        if vector_traces:
+            for arrow_trace in vector_traces:
+                arrow_trace.x = [0, 0]
+                arrow_trace.y = [0, 0]
+
+    def _remove_legend(self):
         """
         Resets the labels of all sensor legends to the default value '0 V'.
         This can be used when removing the light vector or resetting the graph.
