@@ -67,12 +67,13 @@ class Graph:
                 x=1,  # Position to the right (x=1)
                 y=0,  # Position at the bottom (y=0)
                 traceorder='normal',  # The order of legend items based on their addition
-                font=dict(size=10, color='#000'),
+                font=dict(size=15, color='#000'),
                 title=dict(
                     text="Sensor values",  # Title of the legend
                     font=dict(size=12, color="black"),
                     side="top"  # Position of the title
                 ),
+                
                 itemclick=False,
                 itemdoubleclick=False,
 
