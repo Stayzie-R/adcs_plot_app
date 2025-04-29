@@ -626,7 +626,7 @@ class Graph:
                 arrow_trace.y = [0, 0]
                 arrow_trace.z = [0, 0]
 
-    def _graph_remove_legend_3d(self):
+    def _remove_legend_3d(self):
         """
         Resets the labels of all sensor legends to the default value '0 V'.
         This can be used when removing the light vector or resetting the graph.
@@ -634,6 +634,12 @@ class Graph:
         legends = [trace for trace in self._fig_3d.data if trace.name is not None and 'Sensor' in trace.name]
         for it, legend in enumerate(legends):
             legend.name = f'Sensor {str(it + 1)}: {str(0)} V'
+
+    def _remove_light_vec_annotation(self):
+        for annotation in self._fig_3d.layout.annotations:
+            if isinstance(annotation.text, str) and annotation.text.strip().startswith("[") and annotation.text.strip().endswith("]"):
+                annotation.update(text=str([0.0,0.0,0.0]))
+                break
 
     @property
     def figure_3d(self):
