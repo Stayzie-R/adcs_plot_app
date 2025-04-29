@@ -67,7 +67,7 @@ app.layout = html.Div(
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
     data = request.get_json()
-
+    print("received vector: ", str(graph.light_vector))
     light_vector = data["light_vector"]
     sensors = [
         {
@@ -94,7 +94,7 @@ def update_plot(n_intervals, data_store):
     #     #print("No update")
     #     raise PreventUpdate
     # #print("Update")
-    print("vector: ", str(graph.light_vector))
+    print("updating vector: ", str(graph.light_vector))
     return graph.figure_3d, graph.figure_2d
 
 
