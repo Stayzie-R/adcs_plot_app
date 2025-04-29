@@ -513,7 +513,7 @@ class Graph:
         Adds or updates the light vector arrow in the 2D figure.
         """
         target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH
-        vec = self.light_vector
+        vec = self.convert_real_to_dash_coordinates(self.light_vector)
         vec = np.array(vec)
         vec_len = np.linalg.norm(vec[:2])
 
