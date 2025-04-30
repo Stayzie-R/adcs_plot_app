@@ -1,8 +1,10 @@
 import os
 import time
-import queue
+from datetime import datetime, timedelta, timezone
+
 import flask
 from flask import request, jsonify, Response
+
 
 import dash
 from dash import dcc, html, Output, Input, State, no_update
@@ -67,9 +69,13 @@ app.layout = html.Div(
     }
 )
 
+last_data_update_time = datetime.now(timezone.utc)
+data_timeout = timedelta(seconds=5)
+data_has_arrived = False
 
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
+    global last_data_update_time, data_has_arrived
     data = request.get_json()
     print("received vector: ", str(graph.light_vector))
     light_vector = data["light_vector"]
@@ -83,23 +89,24 @@ def update_vector():
     ]
 
     graph.on_update(light_vector, sensors)
+    last_data_update_time = datetime.now(timezone.utc)
+    data_has_arrived = True
     return jsonify({"status": "success", "message": "Data received and processed"})
 
 
-lock = False
-
+camera_move_lock = False
 
 @app.server.route('/interaction_start', methods=['POST'])
 def lock_camera_backend():
-    global lock
+    global camera_move_lock
     lock = True
     return jsonify(status="ok")
 
 
 @app.server.route('/interaction_end', methods=['POST'])
 def unlock_camera_backend():
-    global lock
-    lock = False
+    global camera_move_lock
+    camera_move_lock = False
     print("Camera unlocked from frontend!")
     return jsonify(status="unlocked")
 
@@ -109,8 +116,15 @@ def unlock_camera_backend():
     [Input('interval-component', 'n_intervals')]
 )
 def update_plot(n_intervals):
-    if lock:
+    global camera_move_lock, last_data_update_time, data_timeout, data_has_arrived
+    if not data_has_arrived:
         return no_update, no_update
+    if datetime.now(timezone.utc) - last_data_update_time > data_timeout:
+        graph.on_remove()
+        data_has_arrived = False
+        last_data_update_time = now
+    if camera_move_lock:
+        return no_update, graph.figure_2d
     return graph.figure_3d, graph.figure_2d
 
 
