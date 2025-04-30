@@ -667,11 +667,18 @@ class Graph:
             legend.name = f'Sensor {str(it + 1)}: {str(0)} V'
 
     def _remove_light_vec_annotation(self):
-        for annotation in self._fig_2d.layout.annotations:
-            print(str(annotation))
-            if isinstance(annotation.text, str) and annotation.text.strip().startswith("[") and annotation.text.strip().endswith("]"):
-                print("\n\n removing anotation: ", str(annotation), "\n\n")
-                annotation.update(text=str([0.0,0.0,0.0]))
+        for i, annotation in enumerate(self._fig_2d.layout.annotations):
+            if (
+                    isinstance(annotation.text, str) and
+                    annotation.text.strip().startswith("[") and
+                    annotation.text.strip().endswith("]")
+            ):
+                print(f"\n\n[INFO] Replacing annotation at index {i}: {annotation.text}\n\n")
+                new_annotation = annotation.to_plotly_json()
+                new_annotation["text"] = str([0.0, 0.0, 0.0])
+                annotations = list(self._fig_2d.layout.annotations)
+                annotations[i] = new_annotation
+                self._fig_2d.update_layout(annotations=annotations)
                 break
 
     @property
