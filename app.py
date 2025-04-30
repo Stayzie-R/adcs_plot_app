@@ -23,6 +23,10 @@ app = dash.Dash(
 
 graph = Graph()
 
+with open("camera_interaction.html", "r") as f:
+    app.index_string = f.read()
+
+
 app.title = "ADCS - Visualization"
 app.update_title=None
 app.layout = html.Div(
@@ -52,7 +56,6 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom3d', 'pan3d', 'select3d', 'lasso3d', 'resetCameraLastSave3d', 'resetCameraDefault3d']
             }
         ),
-        dcc.Store(id='camera-lock', data=False),
         dcc.Interval(id='interval-component',interval=1000),
     ],
     style={
@@ -64,46 +67,52 @@ app.layout = html.Div(
     }
 )
 
-@app.server.route('/update_vector', methods=['POST'])
-def update_vector():
-    data = request.get_json()
-    print("received vector: ", str(graph.light_vector))
-    light_vector = data["light_vector"]
-    sensors = [
-        {
-            "color": sensor["color"],
-            "vector": sensor["vector"],
-            "value": round(sensor["value"], 4)
-        }
-        for sensor in data["sensors"]
-    ]
 
-    graph.on_update(light_vector, sensors)
-    return jsonify({"status": "success", "message": "Data received and processed"})
+# @app.server.route('/update_vector', methods=['POST'])
+# def update_vector():
+#     data = request.get_json()
+#     print("received vector: ", str(graph.light_vector))
+#     light_vector = data["light_vector"]
+#     sensors = [
+#         {
+#             "color": sensor["color"],
+#             "vector": sensor["vector"],
+#             "value": round(sensor["value"], 4)
+#         }
+#         for sensor in data["sensors"]
+#     ]
+#
+#     graph.on_update(light_vector, sensors)
+#     return jsonify({"status": "success", "message": "Data received and processed"})
 
 
+lock = False
 
-@app.callback(
-    Output('camera-lock', 'data'),
-    Input('3d-graph', 'relayoutData')
-)
-def lock_camera(relayout_data):
-    if 'scene' in relayout_data and 'camera' in relayout_data['scene']:
-        return True
-    return False
+
+@app.server.route('/interaction_start', methods=['POST'])
+def lock_camera_backend():
+    global lock
+    lock = True
+    return jsonify(status="ok")
+
+
+@app.server.route('/interaction_end', methods=['POST'])
+def unlock_camera_backend():
+    global lock
+    lock = False
+    print("Camera unlocked from frontend!")
+    return jsonify(status="unlocked")
 
 
 @app.callback(
     [Output('3d-graph', 'figure'), Output('2d-graph', 'figure')],
-    [Input('interval-component', 'n_intervals')],
-    [State('camera-lock', 'data')]
+    [Input('interval-component', 'n_intervals')]
 )
-def update_plot(n_intervals, camera_lock):
-    if camera_lock:
-        return dash.no_update, dash.no_update
-
-    print("updating vector: ", str(graph.light_vector))
+def update_plot(n_intervals):
+    if lock:
+        return no_update, no_update
     return graph.figure_3d, graph.figure_2d
+
 
 
 if __name__ == "__main__":

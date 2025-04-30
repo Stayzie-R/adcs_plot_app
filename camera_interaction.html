@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var checkInterval = setInterval(function() {
+                var graphDiv = document.querySelector('[id^="3d-graph"] .js-plotly-plot');
+                if (graphDiv && window.Plotly && typeof graphDiv.on === "function") {
+                    let isInteracting = false;
+
+                    function updateDashStore(lockState) {
+                        const store = document.getElementById("camera-lock-trigger")
+                        if (store) {
+                            console.log("[JS] camera-lock-trigger updated:", lockState);
+                        } else {
+                            console.warn("[JS] ⚠️ camera-lock-trigger store not found!");
+                        }
+                    }
+
+                    function lockInteraction() {
+                        if (!isInteracting) {
+                            console.log("User started interacting");
+                            fetch("/interaction_start", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ lock: true })
+                            }).then(() => updateDashStore(true));
+                            isInteracting = true;
+                        }
+                    }
+
+                    function unlockInteraction() {
+                        console.log("User finished interacting");
+                        fetch("/interaction_end", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ lock: false })
+                        }).then(() => updateDashStore(false));
+                        isInteracting = false;
+                    }
+
+                    graphDiv.on("plotly_relayouting", function() {
+                        lockInteraction();
+                    });
+
+                    graphDiv.addEventListener("mouseup", function() {
+                        if (isInteracting) unlockInteraction();
+                    });
+
+                    graphDiv.addEventListener("touchend", function() {
+                        if (isInteracting) unlockInteraction();
+                    });
+
+                    console.log("Listeners attached to 3D graph.");
+                    clearInterval(checkInterval);
+                }
+            }, 500);
+        });
+        </script>
+    </body>
+</html>
