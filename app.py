@@ -68,22 +68,22 @@ app.layout = html.Div(
 )
 
 
-# @app.server.route('/update_vector', methods=['POST'])
-# def update_vector():
-#     data = request.get_json()
-#     print("received vector: ", str(graph.light_vector))
-#     light_vector = data["light_vector"]
-#     sensors = [
-#         {
-#             "color": sensor["color"],
-#             "vector": sensor["vector"],
-#             "value": round(sensor["value"], 4)
-#         }
-#         for sensor in data["sensors"]
-#     ]
-#
-#     graph.on_update(light_vector, sensors)
-#     return jsonify({"status": "success", "message": "Data received and processed"})
+@app.server.route('/update_vector', methods=['POST'])
+def update_vector():
+    data = request.get_json()
+    print("received vector: ", str(graph.light_vector))
+    light_vector = data["light_vector"]
+    sensors = [
+        {
+            "color": sensor["color"],
+            "vector": sensor["vector"],
+            "value": round(sensor["value"], 4)
+        }
+        for sensor in data["sensors"]
+    ]
+
+    graph.on_update(light_vector, sensors)
+    return jsonify({"status": "success", "message": "Data received and processed"})
 
 
 lock = False
