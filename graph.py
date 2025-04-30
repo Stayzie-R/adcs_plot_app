@@ -66,7 +66,7 @@ class Graph:
                 yaxis=dict(visible=False),       # Hides the Y axis in the 3D scene
                 zaxis=dict(visible=False),       # Hides the Z axis in the 3D scene
                 camera=dict(                     # Defines the initial position of the camera.
-                    eye=dict(x=1.8, y=1.1, z=1.14)
+                    eye=dict(x=-1.48, y=-0.84, z=0.85)
                 )
             ),
             width=500,                           # Width of the graph in pixels
@@ -630,7 +630,6 @@ class Graph:
         current sensor data is no longer needed, effectively clearing it
         from the 3D graph.
         """
-        print("\n\non remove\n\n")
         self.sensor_values = [0] * len(self.sensors)
 
         light_vector = [0.0, 0.0, 0.0]
@@ -663,7 +662,6 @@ class Graph:
 
     def _remove_light_vec_2d(self):
         vector_traces = [trace for trace in self._fig_2d.data if trace.name == 'light_vector_2d']
-        print("\n\n removing 2d vector: ", str(vector_traces), "\n\n")
         if vector_traces:
             for arrow_trace in vector_traces:
                 arrow_trace.x = [0, 0]
@@ -685,7 +683,6 @@ class Graph:
                     annotation.text.strip().startswith("[") and
                     annotation.text.strip().endswith("]")
             ):
-                print(f"\n\n[INFO] Replacing annotation at index {i}: {annotation.text}\n\n")
                 new_annotation = annotation.to_plotly_json()
                 new_annotation["text"] = str([0.0, 0.0, 0.0])
                 annotations = list(self._fig_2d.layout.annotations)
