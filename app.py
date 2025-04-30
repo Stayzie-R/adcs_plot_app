@@ -134,9 +134,8 @@ def update_plot(n_intervals):
     # Check if data hasn't been updated within the timeout period
     if datetime.now(timezone.utc) - last_data_update_time > data_timeout:
         print("[WARNING] No new data received, Data timeout reached — clearing graph.")
-        graph.on_remove()                # Clear the graph due to stale data
-        data_has_arrived = False         # Reset flag to wait for new incoming data
-        last_data_update_time = datetime.now(timezone.utc)  # Avoid repeated clearing
+        graph.on_remove()                
+        data_has_arrived = False         # Reset flag 
 
     # If the camera is currently being moved, avoid updating the 3D graph
     if camera_move_lock:
