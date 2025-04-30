@@ -1,4 +1,5 @@
 from itertools import combinations, product
+from webbrowser import open_new_tab
 
 import plotly.graph_objs as go
 import numpy as np
@@ -630,11 +631,22 @@ class Graph:
         from the 3D graph.
         """
         print("\n\non remove\n\n")
-        self.light_vector = [0.0, 0.0, 0.0]
         self.sensor_values = [0] * len(self.sensors)
-        self._remove_light_vec_3d()
-        self._remove_light_vec_2d()
-        self._remove_legend()
+
+        light_vector = [0.0, 0.0, 0.0]
+        sensors = [
+            {
+                "color": sensor["color"],
+                "vector": sensor["vector"],
+                "value": round(sensor["value"], 0)
+            }
+            for sensor in self.sensors
+    
+        ]
+        on_update(light_vector, sensors)
+        #self._remove_light_vec_3d()
+        #self._remove_light_vec_2d()
+        #self._remove_legend()
 
     def _remove_light_vec_3d(self):
         """
