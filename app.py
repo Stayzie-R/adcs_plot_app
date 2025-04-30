@@ -10,7 +10,7 @@ import dash
 from dash import dcc, html, Output, Input, State, no_update
 from dash.exceptions import PreventUpdate
 
-import config
+import config_app as config
 from graph import Graph
 
 
@@ -58,7 +58,7 @@ app.layout = html.Div(
                 'modeBarButtonsToRemove': ['zoom3d', 'pan3d', 'select3d', 'lasso3d', 'resetCameraLastSave3d', 'resetCameraDefault3d']
             }
         ),
-        dcc.Interval(id='interval-component',interval=1000),
+        dcc.Interval(id='interval-component',interval=config.RELOAD_INTERVAL),
     ],
     style={
         "display": "flex",
@@ -70,14 +70,14 @@ app.layout = html.Div(
 )
 
 last_data_update_time = datetime.now(timezone.utc)
-data_timeout = timedelta(seconds=5)
 data_has_arrived = False
+data_timeout = timedelta(seconds=config.DATA_UPDATE_TIMEOUT_SECONDS)
 
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
     global last_data_update_time, data_has_arrived
     data = request.get_json()
-    print("received vector: ", str(graph.light_vector))
+    print("[INFO] Received new vector update from client:", str(graph.light_vector))
     light_vector = data["light_vector"]
     sensors = [
         {
@@ -116,15 +116,27 @@ def unlock_camera_backend():
     [Input('interval-component', 'n_intervals')]
 )
 def update_plot(n_intervals):
-    global camera_move_lock, last_data_update_time, data_timeout, data_has_arrived
+    global camera_move_lock, last_data_update_time, data_has_arrived, data_timeout
+
+    # If no data has ever been received yet, do nothing (avoid clearing graph too early)
     if not data_has_arrived:
+        print("[INFO] No data received yet — skipping graph update.")
         return no_update, no_update
+
+    # Check if data hasn't been updated within the timeout period
     if datetime.now(timezone.utc) - last_data_update_time > data_timeout:
-        graph.on_remove()
-        data_has_arrived = False
-        last_data_update_time = now
+        print("[WARNING] No new data received, Data timeout reached — clearing graph.")
+        graph.on_remove()                # Clear the graph due to stale data
+        data_has_arrived = False         # Reset flag to wait for new incoming data
+        last_data_update_time = datetime.now(timezone.utc)  # Avoid repeated clearing
+
+    # If the camera is currently being moved, avoid updating the 3D graph
     if camera_move_lock:
+        print("[INFO] Camera movement in progress — skipping 3D graph update.")
         return no_update, graph.figure_2d
+
+    # Normal case: update both graphs
+    print("[INFO] Data is up-to-date — updating both graphs.")
     return graph.figure_3d, graph.figure_2d
 
 
