@@ -1,9 +1,4 @@
 
-
-DEBUG = False
-RELOAD_INTERVAL = 500
-
-
 GRAPH_3D_TITLE = "ADCS 3D Visualization"
 GRAPH_2D_TITLE = "Top View Projection"
 TITLE_SIZE = 18
