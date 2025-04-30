@@ -643,7 +643,7 @@ class Graph:
             for sensor in self.sensors
     
         ]
-        on_update(light_vector, sensors)
+        self.on_update(light_vector, sensors)
         #self._remove_light_vec_3d()
         #self._remove_light_vec_2d()
         #self._remove_legend()
