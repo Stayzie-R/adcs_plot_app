@@ -1,3 +1,15 @@
+<!--
+This script attaches event listeners to the 3D Plotly graph after it's rendered.
+
+Purpose:
+- Detects when the user starts interacting with the camera of 3D graph (rotation, zoom).
+- Sends POST requests to backend endpoints /interaction_start and /interaction_end
+  to lock/unlock camera updates in Dash callbacks.
+
+Behavior:
+- Uses `plotly_relayouting` event to detect interaction start.
+- Uses `mouseup` and `touchend` to detect interaction end.
+-->
 <!DOCTYPE html>
 <html>
     <head>

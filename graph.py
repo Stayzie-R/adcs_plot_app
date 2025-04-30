@@ -13,7 +13,10 @@ class Graph:
     """
     def __init__(self):
         """
-        Initialize the Graph object with a configured figure.
+        Initializes the Graph object:
+        - Loads configuration from config_graph.
+        - Initializes the light vector and sensor metadata.
+        - Prepares and configures empty 3D and 2D Plotly figures.
         """
         self._config = config
 
@@ -38,7 +41,7 @@ class Graph:
 
     def _configure_graph_3d(self):
         """
-        Set up the graph's properties
+        Configure the layout and interaction behavior of the 3D Plotly graph.
         """
         self._fig_3d.update_layout(
             title=dict(
@@ -72,10 +75,13 @@ class Graph:
             width=500,                           # Width of the graph in pixels
             height=500,                          # Height of the graph in pixels
             margin=dict(l=0, r=0, t=50, b=0),    # Margins around the graph
-            hovermode=False,
+            hovermode=False,                     # Hover efekt
         )
         
     def _configure_graph_2d(self):
+        """
+        Configure the layout and styling of the 2D Plotly graph.
+        """
         zoom_factor = 1
         limit = self._config.BOX_SIZE / zoom_factor
         self._fig_2d.update_layout(
@@ -83,7 +89,7 @@ class Graph:
                 text=self._config.GRAPH_2D_TITLE,
                 font=dict(size=self._config.TITLE_SIZE),
                 x=0.35,
-                y=0.8,  # Adjust the title's vertical position (0 is bottom, 1 is top)
+                y=0.8,
                 xanchor='right',
                 yanchor='top'
             ),
@@ -118,14 +124,14 @@ class Graph:
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             legend=dict(
-                x=1.05,  # Position to the right (x=1)
-                y=0,  # Position at the bottom (y=0)
-                traceorder='normal',  # The order of legend items based on their addition
+                x=1.05,
+                y=0,
+                traceorder='normal',
                 font=dict(color=self._config.LEGEND_ITEM_COLOR, size=self._config.LEGEND_ITEM_SIZE),
                 title=dict(
-                    text=self._config.LEGEND_TITLE,  # Title of the legend
+                    text=self._config.LEGEND_TITLE,
                     font=dict(size=self._config.LEGEND_TITLE_SIZE, color=self._config.LEGEND_TITLE_COLOR),
-                    side="top"  # Position of the title
+                    side="top"
                 ),
                 itemclick=False,
                 itemdoubleclick=False,
@@ -134,11 +140,11 @@ class Graph:
 
     def _init_3d(self):
         """
-        Plots all static elements of the 3D scene, including the box, base plane,
-        sensor direction arrows, sensor ellipses, and the legend.
+        Plots all static elements of the scene of 3D graph , including the box, base plane,
+        sensor direction arrows, sensor points.
 
-        This method is typically called once during initialization or when the
-        scene needs to be redrawn with static components that do not change dynamically.
+        This method is called once during initialization to draw static components
+        that do not change dynamically during updates.
         """
         self._create_box_3d()
         self._create_plane_3d()
@@ -146,6 +152,13 @@ class Graph:
         self._create_sensors_ellipse_3d()
 
     def _init_2d(self):
+        """
+        Plots all static elements of the scene of 2D , including the box, base plane,
+        sensor direction arrows, sensor points, legend and light_vector tracer.
+
+        This method is called once during initialization to draw static components
+        that do not change dynamically during updates.
+        """
         self._create_plane_2d()
         self._create_cube_2d()
         self._create_sensor_arrow_2d()
@@ -162,7 +175,7 @@ class Graph:
         radius values in all three dimensions. It is intended for internal
         use to visualize static reference geometry within the 3D scene.
         The box's appearance is controlled by configuration parameters in
-        config.py.
+        config_graph.py.
         """
         radius = [-self._config.BOX_SIZE, self._config.BOX_SIZE]
         for s, e in combinations(np.array(list(product(radius, radius, radius))), 2):
@@ -182,7 +195,11 @@ class Graph:
 
     def _create_cube_2d(self):
         """
-        Creates a simple 2D cube and adds it to the 2D plot.
+        Adds a static 2D square (representing the top view of a cube) to the 2D figure.
+
+        The method calculates corner coordinates based on half the box size
+        and draws the square using a line trace. Visual appearance is controlled
+        by parameters in config_graph.py.
         """
         radius = [-self._config.BOX_SIZE/2, self._config.BOX_SIZE/2]
         x_values = np.array([radius[0], radius[1], radius[1], radius[0], radius[0]])
@@ -226,9 +243,11 @@ class Graph:
 
     def _create_plane_2d(self):
         """
-            Adds a semi-transparent square (plane) to the 2D figure.
-            Used as a reference plane, similar to the 3D version.
-            """
+        Adds a semi-transparent square plane to the 2D scene.
+
+        This plane serves as a visual reference, centered at the origin,
+        and its visibility and size are controlled by configuration settings.
+        """
         if self._config.ALLOW_PLANE:
             radius = self._config.BOX_SIZE/3 * self._config.PLANE_SCALE_FACTOR
             x_values = [-radius, radius, radius, -radius, -radius]
@@ -246,15 +265,10 @@ class Graph:
 
     def _create_sensors_arrow_3d(self):
         """
-        Add directional arrows representing sensor vectors to the 3D figure.
+        Adds directional arrows to the 3D figure representing sensor vectors.
 
-        This method iterates over the configured sensor vectors, determines
-        their orientation, and adds corresponding arrow traces to the figure.
-        Each arrow originates from the origin and points in the direction
-        specified by the sensor vector, scaled appropriately.
-
-        The arrows are styled based on configuration parameters such as
-        arrow length ratio, line width, color, and line style.
+        Each arrow starts at the origin and points in the configured sensor direction,
+        scaled relative to the box size. Styling is defined in the configuration.
         """
         for sensor in self.sensors:
             vector = sensor["vector"]
@@ -283,7 +297,8 @@ class Graph:
 
     def _create_sensor_arrow_2d(self):
         """
-        Adds dashed arrows from the center of the cube outward, extending 0.5 * BOX_SIZE beyond the edge.
+        Adds dashed arrows from the center of the cube outward to visualize sensor directions.
+        Each arrow extends 1.5 times the box size beyond the edge.
         """
         length = self._config.BOX_SIZE * 1.5
 
@@ -383,9 +398,11 @@ class Graph:
 
     def _create_sensors_ellipse_2d(self):
         """
-        Draws 2D circles at the centers of each wall where sensors are located.
-        """
+       Draws 2D ellipses (representing sensors) at the centers of each wall where sensors are located.
 
+       The center of each ellipse is calculated based on the sensor's direction vector, and the final plot includes
+       these ellipses in the 2D visualization with the appropriate color and borders.
+       """
         def create_ellipse(center_x, center_y, radius_x, radius_y, resolution=100):
             theta = np.linspace(0, 2 * np.pi, resolution)
             x = center_x + radius_x * np.cos(theta)
@@ -448,6 +465,17 @@ class Graph:
                 self._fig_2d.add_trace(legend_trace)
 
     def _crete_light_vec_annotation(self):
+        """
+        Manually adds a custom annotation for the light vector value in the 2D figure.
+
+        Since a second legend is not supported in 2D figures, this method creates a
+        custom annotation to display the light vector’s value. The annotation consists of:
+        - The light vector value.
+        - A line (styled like a marker) used to associate the light vector value
+          with the red-colored vector in the figure.
+
+        The position of this annotation is chosen manually and placed directly above the existing legend.
+        """
         legend_position = self._fig_2d.layout.legend
         base_x = legend_position.x
         base_y = legend_position.y + .45
@@ -521,15 +549,14 @@ class Graph:
 
     def _update_light_vec_3d(self):
         """
-        Update or create the light vector arrow in the 3D figure.
+        Updates or creates the light vector arrow in the 3D figure.
 
-        This method checks if a trace named 'light_vector' already exists in the
-        figure. If it does, it updates the arrow coordinates to reflect the current
-        light vector. Otherwise, it creates a new arrow trace to visualize the light
-        vector direction.
+        If the 'light_vector_3d' trace exists, it updates its coordinates to reflect
+        the current light vector. If it doesn't exist, it creates a new arrow from
+        the origin pointing in the direction of `self.light_vector`.
 
-        The arrow originates from the origin and points toward the direction of
-        `self.light_vector`, using styling properties defined in the config.py.
+        The arrow's length is scaled according to the config, and it uses defined styles
+        in config_graph.py.
         """
         target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH
         vec = self.convert_real_to_dash_coordinates(self.light_vector)
@@ -571,7 +598,15 @@ class Graph:
 
     def _update_light_vec_2d(self):
         """
-        Adds or updates the light vector arrow in the 2D figure.
+        Update or create the light vector arrow in the 2D figure.
+
+        This method checks if a trace named 'light_vector_2d' already exists in the
+        figure. If it does, it updates the arrow coordinates to reflect the current
+        light vector. Otherwise, it creates a new arrow trace to visualize the light
+        vector direction in 2D.
+
+        The arrow originates from the origin and points toward the direction of
+        `self.light_vector`, using styling properties defined in the config.py.
         """
         target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH_2D
         vec = self.convert_real_to_dash_coordinates(self.light_vector)
@@ -610,13 +645,20 @@ class Graph:
 
     def _update_legend(self):
         """
-        Update the legend entries in the 3D figure to reflect current sensor values.
+        Update the legend entries in the 2D figure to reflect current sensor values.
+
+        The legend entries are updated with the corresponding sensor values in volts.
         """
         legends = [trace for trace in self._fig_2d.data if trace.name is not None and 'Sensor' in trace.name]
         for it, legend in enumerate(legends):
             legend.name = f'Sensor {str(it + 1)}: {str(self.sensors[it]["value"])} V'
 
     def _update_light_vec_annotation(self):
+        """
+        Update the light vector annotation in the 2D figure.
+
+        The light vector annotation is updated based on the current `self.light_vector` value.
+        """
         for annotation in self._fig_2d.layout.annotations:
             if isinstance(annotation.text, str) and annotation.text.strip().startswith("[") and annotation.text.strip().endswith("]"):
                 annotation.update(text=str(str([round(num, 2) for num in self.light_vector])))
@@ -626,12 +668,8 @@ class Graph:
         """
         Removes the light vector and legend entries from the plot.
 
-        This method is typically called when the visual representation of the
-        current sensor data is no longer needed, effectively clearing it
-        from the 3D graph.
+        The light vector is reset, and the sensors are updated with the current values.
         """
-        self.sensor_values = [0] * len(self.sensors)
-
         light_vector = [0.0, 0.0, 0.0]
         sensors = [
             {
@@ -661,6 +699,10 @@ class Graph:
                 arrow_trace.z = [0, 0]
 
     def _remove_light_vec_2d(self):
+        """
+        Removes the light vector trace from the 2D plot by resetting its coordinates to zero.
+        This method is called when the light vector needs to be removed from the 2D plot.
+        """
         vector_traces = [trace for trace in self._fig_2d.data if trace.name == 'light_vector_2d']
         if vector_traces:
             for arrow_trace in vector_traces:
@@ -677,6 +719,11 @@ class Graph:
             legend.name = f'Sensor {str(it + 1)}: {str(0)} V'
 
     def _remove_light_vec_annotation(self):
+        """
+        Resets the light vector annotation in the 2D plot to its default value '[0.0, 0.0, 0.0]'.
+        This can be used when the light vector is removed, ensuring the annotation shows the
+        correct default state.
+        """
         for i, annotation in enumerate(self._fig_2d.layout.annotations):
             if (
                     isinstance(annotation.text, str) and
@@ -692,19 +739,21 @@ class Graph:
 
     @property
     def figure_3d(self):
-        """Retrieve the current Plotly Figure object.
+        """
+        Get the current šD Plotly figure for rendering.
 
-        This property returns the figure associated with the 3D Graph instance,
-        allowing for further rendering.
+        Returns:
+            plotly.graph_objs.Figure: The 3D Plotly figure object.
         """
         return self._fig_3d
 
     @property
     def figure_2d(self):
-        """Retrieve the current Plotly Figure object.
+        """
+        Get the current 2D Plotly figure for rendering.
 
-        This property returns the figure associated with the 3D Graph instance,
-        allowing for further rendering.
+        Returns:
+            plotly.graph_objs.Figure: The 2D Plotly figure object.
         """
         return self._fig_2d
 
@@ -736,7 +785,7 @@ class Graph:
         Args:
             received (dict): A dictionary containing 'color' and 'vector' keys
                              representing the received sensor data.
-git remote -v  
+
         Returns:
             dict or None: The matched sensor dictionary if found, otherwise None.
         """
@@ -772,15 +821,10 @@ git remote -v
             tuple of float:
                 Converted vector (dash_x, dash_y, dash_z) suitable for Dash plotting.
         """
-        
+
         if len(real_vector) == 3:
             x_real, y_real, z_real = real_vector
-            dash_x = x_real
-            dash_y = -y_real
-            dash_z = z_real
-            return (dash_x, dash_y, dash_z)
+            return (x_real, -y_real, z_real)
         else:
             x_real, y_real = real_vector
-            dash_x = x_real
-            dash_y = -y_real
-            return (dash_x, dash_y)
+            return (x_real, -y_real)
