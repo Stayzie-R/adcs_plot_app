@@ -3,7 +3,7 @@ from itertools import combinations, product
 import plotly.graph_objs as go
 import numpy as np
 
-import config
+import config_graph as config
 
 
 class Graph:
