@@ -629,6 +629,7 @@ class Graph:
         current sensor data is no longer needed, effectively clearing it
         from the 3D graph.
         """
+        print("\n\non remove\n\n")
         self.light_vector = [0.0, 0.0, 0.0]
         self.sensor_values = [0] * len(self.sensors)
         self._remove_light_vec_3d()
@@ -650,6 +651,7 @@ class Graph:
 
     def _remove_light_vec_2d(self):
         vector_traces = [trace for trace in self._fig_3d.data if trace.name == 'light_vector_2d']
+        print("\n\n removing: ", str(vector_traces), "\n\n")
         if vector_traces:
             for arrow_trace in vector_traces:
                 arrow_trace.x = [0, 0]
@@ -667,6 +669,7 @@ class Graph:
     def _remove_light_vec_annotation(self):
         for annotation in self._fig_2d.layout.annotations:
             if isinstance(annotation.text, str) and annotation.text.strip().startswith("[") and annotation.text.strip().endswith("]"):
+                print("\n\n removing: ", str(annotation), "\n\n")
                 annotation.update(text=str([0.0,0.0,0.0]))
                 break
 
