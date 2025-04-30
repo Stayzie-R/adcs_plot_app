@@ -66,7 +66,7 @@ class Graph:
                 yaxis=dict(visible=False),       # Hides the Y axis in the 3D scene
                 zaxis=dict(visible=False),       # Hides the Z axis in the 3D scene
                 camera=dict(                     # Defines the initial position of the camera.
-                    eye=dict(x=-1.48, y=-0.84, z=0.85)
+                    eye=dict(x=1.03, y=-1.54, z=0.45)
                 )
             ),
             width=500,                           # Width of the graph in pixels
