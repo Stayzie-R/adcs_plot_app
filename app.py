@@ -102,7 +102,7 @@ def update_camera(relayout_data):
     if relayout_data and 'scene.camera' in relayout_data:
          camera = relayout_data['scene.camera']['eye']
          return f"Camera position:\nx: {camera['x']:.2f}, y: {camera['y']:.2f}, z: {camera['z']:.2f}"
-     return "Camera position: not moved yet"
+    return "Camera position: not moved yet"
 
 @app.server.route('/interaction_start', methods=['POST'])
 def lock_camera_backend():
