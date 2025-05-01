@@ -73,7 +73,7 @@ For full CLI setup and usage on all operating systems (Windows, macOS, Linux), s
 
 
 ## Camera Locking Logic
-User interaction with the 3D graph (rotation, zoom) triggers JS events in camera_interaction.html, which:
+User interaction with the 3D graph (rotation, zoom) triggers JS events in `camera_interaction.html`, which:
 * Locks the backend update of the 3D graph via `/interaction_start`
 * Unlocks it on interaction end via `/interaction_end`
 * Prevents overwriting camera view during active interaction
