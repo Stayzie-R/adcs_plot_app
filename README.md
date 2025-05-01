@@ -20,7 +20,7 @@ adcs_plot_app/
 ├── config_graph.py         # Additional graph configuration
 ├── camera_interaction.html # Custom Dash HTML template with JS for camera control
 ├── requirements.txt        # Python dependencies
-├── Procfile                # Deployment config for Heroku
+└── Procfile                # Deployment config for Heroku
 ```
 
 
