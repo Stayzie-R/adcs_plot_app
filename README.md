@@ -8,7 +8,7 @@ A web dashboard for real-time visualization of light sensor data and directional
 - **Flask** - Lightweight WSGI web framework.
 - **Plotly.js** - JavaScript library for creating interactive graphs.
 - **Heroku** - Cloud platform to deploy and run the app.
-- 
+
 ## Project Structure
 
 ```
