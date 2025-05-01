@@ -3,6 +3,12 @@
 
 A web dashboard for real-time visualization of light sensor data and directional light vector in 2D and 3D space. Built using Dash (Plotly), Flask, and Plotly.js with interactive camera handling.
 
+## Technologies Used
+- **Dash** (Plotly) - Web framework for creating interactive data visualizations.
+- **Flask** - Lightweight WSGI web framework.
+- **Plotly.js** - JavaScript library for creating interactive graphs.
+- **Heroku** - Cloud platform to deploy and run the app.
+- 
 ## Project Structure
 
 ```
