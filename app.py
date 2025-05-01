@@ -132,7 +132,7 @@ def lock_camera_backend():
         jsonify: A JSON response indicating the success of the operation.
     """
     global camera_move_lock
-    lock = True
+    camera_move_lock = True
     logging.info("[INFO] Camera locked from frontend!")
     return jsonify(status="ok")
 
@@ -176,16 +176,18 @@ def update_plot(n_intervals):
         logging.info("[INFO] No data received yet — skipping graph update.")
         return no_update, no_update
 
+    # If the camera is currently being moved, avoid updating the 3D graph
+    if camera_move_lock:
+        logging.info("[INFO] Camera movement in progress — skipping 3D graph update.")
+        return no_update, graph.figure_2d
+
     # Check if data hasn't been updated within the timeout period
     if datetime.now(timezone.utc) - last_data_update_time > data_timeout:
         logging.warning("[WARNING] No new data received, Data timeout reached — clearing graph.")
         graph.on_remove()
         data_has_arrived = False
 
-    # If the camera is currently being moved, avoid updating the 3D graph
-    if camera_move_lock:
-        logging.info("[INFO] Camera movement in progress — skipping 3D graph update.")
-        return no_update, graph.figure_2d
+
 
     # Normal case: update both graphs
     logging.info("[INFO] Data is up-to-date — updating both graphs.")
