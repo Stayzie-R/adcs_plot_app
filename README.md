@@ -48,7 +48,7 @@ This app can be deployed in two main ways:
 - **Via CLI (Heroku Command Line Interface)** – recommended for more control and automation.
 
 ### 1. Deploy via Heroku Dashboard (GUI)
-    1. Go to [Heroku Dashboard](#https://dashboard.heroku.com)
+    1. Go to [Heroku Dashboard](https://dashboard.heroku.com)
     2. Log in or create a new Heroku account
     3. Create a new app via button "New"
     4. Go to Deploy tab
