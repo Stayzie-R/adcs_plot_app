@@ -48,13 +48,13 @@ This app can be deployed in two main ways:
 - **Via CLI (Heroku Command Line Interface)** – recommended for more control and automation.
 
 ### 1. Deploy via Heroku Dashboard (GUI)
-    1. Go to [Heroku Dashboard](https://dashboard.heroku.com)
-    2. Log in or create a new Heroku account
-    3. Create a new app via button "New"
-    4. Go to Deploy tab
-    5. Select GitHub as deployment method in
-    6. Connect this GitHub repository
-    7. Enable Automatic Deploys or click Deploy Branch
+1. Go to [Heroku Dashboard](https://dashboard.heroku.com)
+2. Log in or create a new Heroku account
+3. Create a new app via button "New"
+4. Go to Deploy tab
+5. Select GitHub as deployment method in
+6. Connect this GitHub repository
+7. Enable Automatic Deploys or click Deploy Branch
 ### 2. Deploy via Heroku CLI
 For full CLI setup and usage on all operating systems (Windows, macOS, Linux), see the [official Heroku CLI guide](https://devcenter.heroku.com/articles/heroku-cli).
 
