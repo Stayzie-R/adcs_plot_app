@@ -1,2 +1,19 @@
-### ADCS Visualization Dashboard
-A professional web dashboard for real-time visualization of light sensor data and directional vectors in 2D and 3D space. Built using Dash (Plotly), Flask, and Plotly.js with interactive camera handling.
+
+# ADCS Visualization Dashboard
+
+A web dashboard for real-time visualization of light sensor data and directional light vector in 2D and 3D space. Built using Dash (Plotly), Flask, and Plotly.js with interactive camera handling.
+
+## Project Structure
+
+```
+adcs_plot_app/
+│
+├── app.py                  # Main Dash + Flask application
+├── graph.py                # Graph logic and update handling
+├── config_app.py           # Global app configuration
+├── config_graph.py         # Additional graph configuration
+├── camera_interaction.html # Custom Dash HTML template with JS for camera control
+├── requirements.txt        # Python dependencies
+├── Procfile                # Deployment config for Heroku
+
+```
