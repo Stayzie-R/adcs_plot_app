@@ -23,7 +23,6 @@ adcs_plot_app/
 └── Procfile                # Deployment config for Heroku
 ```
 
-
 ## Loally Installation
 
 ### 1. Clone the repository

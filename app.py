@@ -60,6 +60,7 @@ app.layout = html.Div(
             }
         ),
         dcc.Interval(id='interval-component',interval=config.RELOAD_INTERVAL),
+        html.Pre(id='camera-lock-trigger'), 
         html.Pre(id='camera-output')
     ],
     style={
