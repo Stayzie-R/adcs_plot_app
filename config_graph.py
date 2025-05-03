@@ -1,66 +1,103 @@
+from dataclasses import dataclass
+from typing import Tuple, Dict
 
-GRAPH_3D_TITLE = "ADCS 3D Visualization"
-GRAPH_2D_TITLE = "Top View Projection"
-TITLE_SIZE = 18
 
-LEGEND_TITLE = "Sensor Readings"
-LIGHT_VEC_ANNOT = "Light Vector"
+@dataclass
+class TitleConfig:
+    TITLE_3D: str = "ADCS 3D Visualization"
+    TITLE_2D: str = "Top View Projection"
+    TEXT_SIZE: int = 18
 
-LEGEND_TITLE_SIZE = 14
-LEGEND_TITLE_COLOR = "black"
-LEGEND_ITEM_SIZE = 12
-LEGEND_ITEM_COLOR =  "black"
 
-ANNOTATION_TITLE_SIZE = LEGEND_TITLE_SIZE
-ANNOTATION_TITLE_COLOR = LEGEND_TITLE_COLOR
-ANNOTATION_ITEM_SIZE = LEGEND_ITEM_SIZE
-ANNOTATION_ITEM_COLOR =  LEGEND_ITEM_COLOR
+@dataclass
+class LegendConfig:
+    TITLE: str = "Sensor Readings"
+    TITLE_SIZE: int = 14
+    TITLE_COLOR: str = "black"
+    ITEM_SIZE: int = 12
+    ITEM_COLOR: str = "black"
 
-BOX_SIZE = 1
-BOX_COLOR = 'black'
-BOX_LINEWIDTH = 1.5
-BOX_LINESTYLE = 'solid'
 
-CUBE_LINEWIDTH = 0.8
-CUBE_COLOR = 'black'
+@dataclass
+class LegendLightVectorConfig:
+    TITLE: str = "Light Vector"
+    TITLE_SIZE: int = 14
+    TITLE_COLOR: str = "black"
+    ITEM_SIZE: int = 12
+    ITEM_COLOR: str = "black"
 
-ALLOW_PLANE = True
-PLANE_SCALE_FACTOR = 2
-PLANE_COLOR = 'gray'
 
-SENSORS = {
-    "white":(1, 0, 0),
-    "yellow":(0, 1, 0),
-    "brown":(-1, 0, 0),
-    "green":(0, -1, 0),
-    "orange":(0, 0, 1),
-    "":(0, 0, -1)
-}
+@dataclass
+class BoxConfig:
+    SIZE: float = 1
+    COLOR: str = "black"
+    LINEWIDTH_3D: float = 1.5
+    LINESTYLE: str = "solid"
+    LINEWIDTH_2D: float = 0.8
 
-LEGEND_COLORS = {
-    "white": "#FFFFFF",
-    "yellow": "#FFFF00",
-    "brown": "#8B4513",
-    "green": "#228B22",
-    "orange": "#FF8C00",
-    "": ""
-}
 
-SENSOR_COLOR_DEFAULT = "white"
-SENSOR_COLOR_BORDER = 'black'
-SENSOR_LINE_WIDTH = .5
-SENSOR_RADIUS_MINOR = .1
-SENSOR_RADIUS_MAJOR = .15
+@dataclass
+class PlaneConfig:
+    ALLOW: bool = True
+    SCALE_FACTOR: float = 2
+    COLOR: str = "gray"
 
-SENSOR_ARROW_LINEWIDTH = 5.0
-SENSOR_ARROW_LINESTYLE = "dash"
-SENSOR_ARROW_COLOR = "gray"
-SENSOR_ARROW_LENGTH_RATIO = 1.5
 
-LIGHT_VECTOR_COLOR = "red"
-LIGHT_VECTOR_WIDTH = 4
-LIGHT_VECTOR_TARGET_LENGTH = 1.5 * BOX_SIZE
+@dataclass
+class SensorsConfig:
+    COLOR_DEFAULT: str = "white"
+    COLOR_BORDER: str = "black"
+    LINE_WIDTH: float = 0.5
+    RADIUS_MINOR: float = 0.1
+    RADIUS_MAJOR: float = 0.15
 
-LIGHT_VECTOR_COLOR_2D = "red"
-LIGHT_VECTOR_WIDTH_2D = 2
-LIGHT_VECTOR_TARGET_LENGTH_2D = .8 * BOX_SIZE
+
+@dataclass
+class ArrowConfig:
+    LINEWIDTH: float = 5.0
+    LINESTYLE: str = "dash"
+    COLOR: str = "gray"
+    LENGTH_RATIO: float = 1.5
+
+
+@dataclass
+class LightVectorConfig:
+    COLOR: str = "red"
+    WIDTH_3D: float = 4
+    TARGET_LENGTH_3D: float = 1.5  # this will be updated dynamically from box.SIZE
+    WIDTH_2D: float = 2
+    TARGET_LENGTH_2D: float = 0.8  # this will be updated dynamically from box.SIZE
+
+
+class Config:
+    def __init__(self):
+        self.title = TitleConfig()
+        self.legend = LegendConfig()
+        self.legend_light_vector = LegendLightVectorConfig()
+        self.box = BoxConfig()
+        self.plane = PlaneConfig()
+        self.sensor = SensorsConfig()
+        self.arrow = ArrowConfig()
+
+        self.light_vector = LightVectorConfig(
+            TARGET_LENGTH_3D=1.5 * self.box.SIZE,
+            TARGET_LENGTH_2D=0.8 * self.box.SIZE
+        )
+
+        self.legend_colors: Dict[str, str] = {
+            "white": "#FFFFFF",
+            "yellow": "#FFFF00",
+            "brown": "#8B4513",
+            "green": "#228B22",
+            "orange": "#FF8C00",
+            "": ""
+        }
+
+        self.SENSORS: Dict[str, Tuple[int, int, int]] = {
+            "white": (1, 0, 0),
+            "yellow": (0, 1, 0),
+            "brown": (-1, 0, 0),
+            "green": (0, -1, 0),
+            "orange": (0, 0, 1),
+            "": (0, 0, -1)
+        }

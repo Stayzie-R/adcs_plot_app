@@ -4,7 +4,7 @@ from webbrowser import open_new_tab
 import plotly.graph_objs as go
 import numpy as np
 
-import config_graph as config
+from config_graph import Config
 
 
 class Graph:
@@ -18,7 +18,7 @@ class Graph:
         - Initializes the light vector and sensor metadata.
         - Prepares and configures empty 3D and 2D Plotly figures.
         """
-        self._config = config
+        self._config = Config()
 
         self.light_vector = [0.0, 0.0, 0.0]
 
@@ -45,7 +45,7 @@ class Graph:
         """
         self._fig_3d.update_layout(
             title=dict(
-                text=self._config.GRAPH_3D_TITLE,
+                text=self._config.title.TITLE_3D,
                 font=dict(size=18),
                 x=0.5,
                 y=0.8,  # Adjust the title's vertical position (0 is bottom, 1 is top)
@@ -83,11 +83,11 @@ class Graph:
         Configure the layout and styling of the 2D Plotly graph.
         """
         zoom_factor = 1
-        limit = self._config.BOX_SIZE / zoom_factor
+        limit = self._config.box.SIZE / zoom_factor
         self._fig_2d.update_layout(
             title=dict(
-                text=self._config.GRAPH_2D_TITLE,
-                font=dict(size=self._config.TITLE_SIZE),
+                text=self._config.title.TITLE_3D,
+                font=dict(size=self._config.title.TEXT_SIZE),
                 x=0.35,
                 y=0.8,
                 xanchor='right',
@@ -127,10 +127,10 @@ class Graph:
                 x=1.05,
                 y=0,
                 traceorder='normal',
-                font=dict(color=self._config.LEGEND_ITEM_COLOR, size=self._config.LEGEND_ITEM_SIZE),
+                font=dict(color=self._config.legend.ITEM_COLOR, size=self._config.legend.ITEM_SIZE),
                 title=dict(
-                    text=self._config.LEGEND_TITLE,
-                    font=dict(size=self._config.LEGEND_TITLE_SIZE, color=self._config.LEGEND_TITLE_COLOR),
+                    text=self._config.legend.TITLE,
+                    font=dict(size=self._config.legend.TITLE_SIZE, color=self._config.legend.TITLE_COLOR),
                     side="top"
                 ),
                 itemclick=False,
@@ -177,7 +177,7 @@ class Graph:
         The box's appearance is controlled by configuration parameters in
         config_graph.py.
         """
-        radius = [-self._config.BOX_SIZE, self._config.BOX_SIZE]
+        radius = [-self._config.box.SIZE, self._config.box.SIZE]
         for s, e in combinations(np.array(list(product(radius, radius, radius))), 2):
             if np.sum(np.abs(s - e)) == radius[1] - radius[0]:
                 pos = [list(pair) for pair in zip(s, e)]
@@ -185,9 +185,9 @@ class Graph:
                     go.Scatter3d(
                         x=pos[0], y=pos[1], z=pos[2],
                         mode='lines',
-                        line=dict(color=self._config.BOX_COLOR,
-                                  width=self._config.BOX_LINEWIDTH,
-                                  dash=self._config.BOX_LINESTYLE),
+                        line=dict(color=self._config.box.COLOR,
+                                  width=self._config.box.LINEWIDTH_3D,
+                                  dash=self._config.box.LINESTYLE),
                         showlegend=False,
                         hoverinfo='none'
                     )
@@ -201,13 +201,13 @@ class Graph:
         and draws the square using a line trace. Visual appearance is controlled
         by parameters in config_graph.py.
         """
-        radius = [-self._config.BOX_SIZE/2, self._config.BOX_SIZE/2]
+        radius = [-self._config.box.SIZE/2, self._config.box.SIZE/2]
         x_values = np.array([radius[0], radius[1], radius[1], radius[0], radius[0]])
         y_values = np.array([radius[0], radius[0], radius[1], radius[1], radius[0]])
 
         self._fig_2d.add_trace(go.Scatter(
             x=x_values, y=y_values, mode='lines',
-            line=dict(color=self._config.CUBE_COLOR, width=self._config.CUBE_LINEWIDTH),
+            line=dict(color=self._config.box.COLOR, width=self._config.box.LINEWIDTH_2D),
             showlegend=False
         ))
         
@@ -220,16 +220,16 @@ class Graph:
         The plane's visibility and appearance are controlled by configuration
         parameters in config.py.
         """
-        if self._config.ALLOW_PLANE:
-            radius = [-self._config.BOX_SIZE, self._config.BOX_SIZE]
-            x_values = self._config.PLANE_SCALE_FACTOR * np.linspace(radius, radius, 1)
-            y_values = self._config.PLANE_SCALE_FACTOR * np.linspace(radius, radius, 1)
+        if self._config.plane.ALLOW:
+            radius = [-self._config.box.SIZE, self._config.box.SIZE]
+            x_values = self._config.plane.SCALE_FACTOR * np.linspace(radius, radius, 1)
+            y_values = self._config.plane.SCALE_FACTOR * np.linspace(radius, radius, 1)
             x_mesh, y_mesh = np.meshgrid(x_values, y_values)
-            z_mesh = np.ones_like(x_mesh) * -self._config.BOX_SIZE
+            z_mesh = np.ones_like(x_mesh) * -self._config.box.SIZE
             self._fig_3d.add_trace(
                 go.Surface(
                     x=x_mesh, y=y_mesh, z=z_mesh,
-                    colorscale=[self._config.PLANE_COLOR] * len(x_mesh.flatten()),
+                    colorscale=[self._config.plane.COLOR] * len(x_mesh.flatten()),
                     showscale=False,
                     opacity=.1,
                     hoverinfo='none',
@@ -248,8 +248,8 @@ class Graph:
         This plane serves as a visual reference, centered at the origin,
         and its visibility and size are controlled by configuration settings.
         """
-        if self._config.ALLOW_PLANE:
-            radius = self._config.BOX_SIZE/3 * self._config.PLANE_SCALE_FACTOR
+        if self._config.plane.ALLOW:
+            radius = self._config.box.SIZE/3 * self._config.plane.SCALE_FACTOR
             x_values = [-radius, radius, radius, -radius, -radius]
             y_values = [-radius, -radius, radius, radius, -radius]
 
@@ -278,17 +278,17 @@ class Graph:
             except StopIteration:
                 continue  # Skip if the vector is [0, 0, 0]
             arrow_direction = 1 if vector[position_idx] > 0 else -1
-            arrow_vector[position_idx] = arrow_direction * self._config.BOX_SIZE
+            arrow_vector[position_idx] = arrow_direction * self._config.box.SIZE
 
             arrow_trace = go.Scatter3d(
-                x=[0, self._config.SENSOR_ARROW_LENGTH_RATIO * arrow_vector[0]],
-                y=[0, self._config.SENSOR_ARROW_LENGTH_RATIO * arrow_vector[1]],
-                z=[0, self._config.SENSOR_ARROW_LENGTH_RATIO * arrow_vector[2]],
+                x=[0, self._config.arrow.LENGTH_RATIO * arrow_vector[0]],
+                y=[0, self._config.arrow.LENGTH_RATIO * arrow_vector[1]],
+                z=[0, self._config.arrow.LENGTH_RATIO * arrow_vector[2]],
                 mode='lines',
                 line=dict(
-                    width=self._config.SENSOR_ARROW_LINEWIDTH,
-                    color=self._config.SENSOR_ARROW_COLOR,
-                    dash=self._config.SENSOR_ARROW_LINESTYLE
+                    width=self._config.arrow.LINEWIDTH,
+                    color=self._config.arrow.COLOR,
+                    dash=self._config.arrow.LINESTYLE
                 ),
                 showlegend=False,
                 hoverinfo='none'
@@ -300,7 +300,7 @@ class Graph:
         Adds dashed arrows from the center of the cube outward to visualize sensor directions.
         Each arrow extends 1.5 times the box size beyond the edge.
         """
-        length = self._config.BOX_SIZE * 1.5
+        length = self._config.box.SIZE * 1.5
 
         directions = [
             (1, 0),
@@ -363,7 +363,7 @@ class Graph:
                 self._fig_3d.add_trace(go.Mesh3d(
                     x=x, y=y, z=z,
                     i=i, j=j, k=k,
-                    color=self._config.LEGEND_COLORS[color],
+                    color=self._config.legend_colors[color],
                     opacity=1,
                     flatshading=True,
                     showscale=False
@@ -375,7 +375,7 @@ class Graph:
                     y=np.append(y[:-1], y[0]),
                     z=np.append(z[:-1], z[0]),
                     mode='lines',
-                    line=dict(color=self._config.SENSOR_COLOR_BORDER, width=self._config.SENSOR_LINE_WIDTH),
+                    line=dict(color=self._config.sensor.COLOR_BORDER, width=self._config.sensor.LINE_WIDTH),
                     hoverinfo='none',
                     showlegend=False
                 ))
@@ -384,7 +384,7 @@ class Graph:
             vector = sensor["vector"]
             vector = self.convert_real_to_dash_coordinates(vector)
             vec = np.array(vector)
-            center = vec * self._config.BOX_SIZE
+            center = vec * self._config.box.SIZE
             axis = ['x', 'y', 'z'][np.argmax(np.abs(vec))]
 
             color = sensor["color"]
@@ -392,8 +392,8 @@ class Graph:
                 center=center,
                 axis=axis,
                 color=color,
-                radius_major=self._config.SENSOR_RADIUS_MAJOR,
-                radius_minor=self._config.SENSOR_RADIUS_MINOR,
+                radius_major=self._config.sensor.RADIUS_MAJOR,
+                radius_minor=self._config.sensor.RADIUS_MINOR,
             )
 
     def _create_sensors_ellipse_2d(self):
@@ -414,15 +414,15 @@ class Graph:
             if not color:
                 continue
             x_dir, y_dir, z_dir = self.convert_real_to_dash_coordinates(vector)
-            center_x = x_dir * self._config.BOX_SIZE/2
-            center_y = y_dir * self._config.BOX_SIZE/2
+            center_x = x_dir * self._config.box.SIZE/2
+            center_y = y_dir * self._config.box.SIZE/2
 
             if center_x == 0:
-                radius_major = self._config.BOX_SIZE * .06
-                radius_minor = self._config.BOX_SIZE * .04
+                radius_major = self._config.box.SIZE * .06
+                radius_minor = self._config.box.SIZE * .04
             else:
-                radius_major = self._config.BOX_SIZE * .04
-                radius_minor = self._config.BOX_SIZE * .06
+                radius_major = self._config.box.SIZE * .04
+                radius_minor = self._config.box.SIZE * .06
 
             x, y = create_ellipse(center_x, center_y, radius_major, radius_minor)
 
@@ -430,7 +430,7 @@ class Graph:
                 x=x, y=y,
                 mode='lines',
                 fill='toself',
-                fillcolor=self._config.LEGEND_COLORS.get(color, 'white'),
+                fillcolor=self._config.legend_colors.get(color, 'white'),
                 line=dict(color='black', width=1),
                 name=color,
                 showlegend=False,
@@ -452,7 +452,7 @@ class Graph:
                     x=[None], y=[None], z=[None],
                     mode='markers',
                     marker=dict(
-                        color=self._config.LEGEND_COLORS[color],
+                        color=self._config.legend_colors[color],
                         size=10,
                         line=dict(
                             color='black',
@@ -482,13 +482,13 @@ class Graph:
 
         annotations = [
             dict(
-                text=self._config.LIGHT_VEC_ANNOT,
+                text=self._config.legend_light_vector.TITLE,
                 xref="paper", yref="paper",
                 x=base_x, y=base_y,
                 showarrow=False,
                 xanchor='left',
                 yanchor='top',
-                font=dict(size=self._config.ANNOTATION_TITLE_SIZE, color=self._config.ANNOTATION_TITLE_COLOR),
+                font=dict(size=self._config.legend_light_vector.TITLE_SIZE, color=self._config.legend_light_vector.TITLE_COLOR),
             ),
             dict(
                 text= str([round(num, 2) for num in self.light_vector]),
@@ -497,7 +497,7 @@ class Graph:
                 showarrow=False,
                 bgcolor="rgba(0,0,0,0)",
                 xanchor='left',
-                font=dict(size=self._config.ANNOTATION_ITEM_SIZE, color=self._config.ANNOTATION_ITEM_COLOR),
+                font=dict(size=self._config.legend_light_vector.ITEM_SIZE, color=self._config.legend_light_vector.ITEM_COLOR),
             ),
         ]
         for annot in annotations:
@@ -511,7 +511,7 @@ class Graph:
             x1=base_x + 0.04 + position_x_end, y1=base_y - 0.07,
             xref="paper", yref="paper",
             line=dict(
-                color=self._config.LIGHT_VECTOR_COLOR,
+                color=self._config.light_vector.COLOR,
                 width=3.5,
             ),
             layer="above"
@@ -558,7 +558,7 @@ class Graph:
         The arrow's length is scaled according to the config, and it uses defined styles
         in config_graph.py.
         """
-        target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH
+        target_length = self._config.light_vector.TARGET_LENGTH_3D
         vec = self.convert_real_to_dash_coordinates(self.light_vector)
         vec = np.array(vec)
         vec_len = np.linalg.norm(vec)
@@ -581,8 +581,8 @@ class Graph:
         else:
             arrow_properties = dict(
                 line=dict(
-                    color=self._config.LIGHT_VECTOR_COLOR,
-                    width=self._config.LIGHT_VECTOR_WIDTH
+                    color=self._config.light_vector.COLOR,
+                    width=self._config.light_vector.WIDTH
                 )
             )
             vec_trace = go.Scatter3d(
@@ -608,7 +608,7 @@ class Graph:
         The arrow originates from the origin and points toward the direction of
         `self.light_vector`, using styling properties defined in the config.py.
         """
-        target_length = self._config.LIGHT_VECTOR_TARGET_LENGTH_2D
+        target_length = self._config.light_vector.TARGET_LENGTH_2D
         vec = self.convert_real_to_dash_coordinates(self.light_vector)
         vec = np.array(vec)
         vec_len = np.linalg.norm(vec[:2])
@@ -629,8 +629,8 @@ class Graph:
         else:
             arrow_properties = dict(
                 line=dict(
-                    color=self._config.LIGHT_VECTOR_COLOR_2D,
-                    width=self._config.LIGHT_VECTOR_WIDTH_2D
+                    color=self._config.light_vector.COLOR,
+                    width=self._config.light_vector.WIDTH
                 )
             )
             vec_trace = go.Scatter(
