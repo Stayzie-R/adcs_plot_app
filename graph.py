@@ -460,7 +460,7 @@ class Graph:
                         )
                     ),
                     showlegend=True,
-                    name=f'Sensor {index + 1}: {str(sensor['value'])}'
+                    name = 'Sensor ' + str(index + 1) + ': ' + str(sensor['value'])
                 )
                 self._fig_2d.add_trace(legend_trace)
 
@@ -651,7 +651,7 @@ class Graph:
         """
         legends = [trace for trace in self._fig_2d.data if trace.name is not None and 'Sensor' in trace.name]
         for it, legend in enumerate(legends):
-            legend.name = f'Sensor {str(it + 1)}: {str(self.sensors[it]["value"])} V'
+            legend.name = 'Sensor ' + str(it + 1) + ': ' + str(self.sensors[it]["value"]) + ' V'
 
     def _update_light_vec_annotation(self):
         """
@@ -716,7 +716,7 @@ class Graph:
         """
         legends = [trace for trace in self._fig_2d.data if trace.name is not None and 'Sensor' in trace.name]
         for it, legend in enumerate(legends):
-            legend.name = f'Sensor {str(it + 1)}: {str(0)} V'
+            legend.name = 'Sensor ' + str(it + 1) + ': ' + str(0) + ' V'
 
     def _remove_light_vec_annotation(self):
         """
