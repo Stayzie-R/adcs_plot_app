@@ -184,6 +184,7 @@ def update_plot(n_intervals):
     # Check if data hasn't been updated within the timeout period
     if datetime.now(timezone.utc) - last_data_update_time > data_timeout:
         logging.warning("[WARNING] No new data received, Data timeout reached — clearing graph.")
+        new_data = False
         graph.on_remove()
         data_has_arrived = False
 
