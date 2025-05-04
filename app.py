@@ -73,12 +73,12 @@ app.layout = html.Div(
 )
 
 last_data_update_time = datetime.now(timezone.utc)
-data_has_arrived = False
+new_data = False
 data_timeout = timedelta(seconds=config.DATA_UPDATE_TIMEOUT_SECONDS)
 
 @app.server.route('/update_vector', methods=['POST'])
 def update_vector():
-    global last_data_update_time, data_has_arrived
+    global last_data_update_time, new_data
     data = request.get_json()
     logging.info("[INFO] Received new vector update from client.")
     light_vector = data["light_vector"]
@@ -93,7 +93,7 @@ def update_vector():
 
     graph.on_update(light_vector, sensors)
     last_data_update_time = datetime.now(timezone.utc)
-    data_has_arrived = True
+    new_data  = True
     return jsonify({"status": "success", "message": "Data received and processed"})
 
 
@@ -169,10 +169,10 @@ def update_plot(n_intervals):
     Returns:
         Tuple: Updated figures for 3D and 2D graphs
     """
-    global camera_move_lock, last_data_update_time, data_has_arrived, data_timeout
+    global camera_move_lock, last_data_update_time, new_data , data_timeout
 
     # If no data has ever been received yet, do nothing (avoid clearing graph too early)
-    if not data_has_arrived:
+    if not new_data:
         logging.info("[INFO] No data received yet — skipping graph update.")
         return no_update, no_update
 

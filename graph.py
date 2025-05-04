@@ -4,7 +4,7 @@ from webbrowser import open_new_tab
 import plotly.graph_objs as go
 import numpy as np
 
-from config_graph import Config
+from config_graph import Config_Graph
 
 
 class Graph:
@@ -18,7 +18,7 @@ class Graph:
         - Initializes the light vector and sensor metadata.
         - Prepares and configures empty 3D and 2D Plotly figures.
         """
-        self._config = Config()
+        self._config = Config_Graph()
 
         self.light_vector = [0.0, 0.0, 0.0]
 

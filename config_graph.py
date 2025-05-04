@@ -69,7 +69,7 @@ class LightVectorConfig:
     TARGET_LENGTH_2D: float = 0.8  # this will be updated dynamically from box.SIZE
 
 
-class Config:
+class Config_Graph:
     def __init__(self):
         self.title = TitleConfig()
         self.legend = LegendConfig()
