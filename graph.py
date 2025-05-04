@@ -582,7 +582,7 @@ class Graph:
             arrow_properties = dict(
                 line=dict(
                     color=self._config.light_vector.COLOR,
-                    width=self._config.light_vector.WIDTH
+                    width=self._config.light_vector.WIDTH_3D
                 )
             )
             vec_trace = go.Scatter3d(
@@ -630,7 +630,7 @@ class Graph:
             arrow_properties = dict(
                 line=dict(
                     color=self._config.light_vector.COLOR,
-                    width=self._config.light_vector.WIDTH
+                    width=self._config.light_vector.WIDTH_2D
                 )
             )
             vec_trace = go.Scatter(
