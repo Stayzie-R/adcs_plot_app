@@ -86,7 +86,7 @@ class Graph:
         limit = self._config.box.SIZE / zoom_factor
         self._fig_2d.update_layout(
             title=dict(
-                text=self._config.title.TITLE_3D,
+                text=self._config.title.TITLE_2D,
                 font=dict(size=self._config.title.TEXT_SIZE),
                 x=0.35,
                 y=0.8,
